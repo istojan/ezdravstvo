@@ -1,0 +1,19 @@
+#login_form_id{
+    margin-top: 50px;
+    margin-left: 50px;
+}
+
+#body_container{
+    background: white;
+    width: 700px;
+    margin-top: 150px;
+    margin-left: auto;
+    margin-right: auto;
+    /*margin: auto;*/
+    height: 500px;
+    border: solid lightblue 5px;
+}
+
+/*#id_username{*/
+    /*visibility: hidden;*/
+/*}*/

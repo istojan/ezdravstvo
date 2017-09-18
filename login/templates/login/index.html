@@ -1,0 +1,49 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'login/style.css' %}" />
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+{#    <style>#}
+{#        .helptext{#}
+{#              visibility: hidden;#}
+{#        }#}
+{##}
+{##}
+{#    </style>#}
+
+</head>
+<body>
+    <div id="body_container">
+        <h1>Hello Friend. This is the Login Page.</h1>
+
+        <form id="login_form_id" action="?" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Submit">
+        </form>
+
+    </div>
+
+
+
+
+{#{% if latest_question_list %}#}
+{#    <ul>#}
+{#    {% for question in latest_question_list %}#}
+{#        First way to do this#}
+{#        <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>#}
+{##}
+{#        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>#}
+{#    {% endfor %}#}
+{#    </ul>#}
+{#{% else %}#}
+{#    <p>No polls are available.</p>#}
+{#{% endif %}#}
+
+</body>
+</html>
