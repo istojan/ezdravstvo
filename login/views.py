@@ -11,7 +11,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from django.contrib.auth.decorators import login_required
 
-from .forms import UserForm
+from login.models import Patient, Doctor
+from .forms import UserForm, PatientRegistrationForm, DoctorRegistrationForm
+
 
 # Create your views here.
 
@@ -160,3 +162,65 @@ def logout_view(request):
 #
 # def logout_view(request):
 #     return render(request, "form.html", {})
+
+
+# View for patient registration
+def register_patient(request):
+    if request.method == 'POST':
+        form = PatientRegistrationForm(request.POST)
+        print('Method = POST')
+        if form.is_valid():
+            print("Valid form")
+            user = form.save()
+            user.refresh_from_db()
+            user.patient = Patient()
+            user.patient.name = form.cleaned_data.get('name')
+            user.patient.surname = form.cleaned_data.get('surname')
+            user.patient.ssn = form.cleaned_data.get('ssn')
+            user.patient.date_of_birth = form.cleaned_data.get('date_of_birth')
+            user.patient.address = form.cleaned_data.get('address')
+            user.patient.email = form.cleaned_data.get('email')
+            user._type = 'P'  # Tip na user
+            user.save()
+            print("User saved")
+            user = authenticate(request, username=request.POST['username'], password=request.POST['password1'])
+            print("User authenticated")
+            login(request, user)
+            print("User logged in")
+            return redirect('login:homepage')
+        else:
+            print("Invalid form")
+    else:
+        print("Method = GET")
+        form = PatientRegistrationForm()
+    return render(request, 'login/register_patient.html', {'form': form})
+
+
+# View for doctor registration
+def register_doctor(request):
+    if request.method == 'POST':
+        form = DoctorRegistrationForm(request.POST)
+        print("Method = POST")
+        if form.is_valid():
+            print("Valid form")
+            user = form.save()
+            user.refresh_from_db()
+            name = form.cleaned_data.get('name')
+            surname = form.cleaned_data.get('surname')
+            doctor_id = form.cleaned_data.get('doctor_id')
+            is_general_practitioner = form.cleaned_data.get('is_general_practitioner')
+            user.doctor = Doctor(name=name, surname=surname, doctor_id=doctor_id,
+                                 is_general_practitioner=is_general_practitioner)
+            user._type = 'D'
+            user.save()
+            print("User saved")
+            user = authenticate(request, username=request.POST['username'], password=request.POST['password1'])
+            print("User authenticated")
+            login(request, user)
+            print("User logged in")
+            return redirect('login:homepage')
+        else:
+            print("Method = GET")
+    else:
+        form = DoctorRegistrationForm()
+    return render(request, 'login/register_doctor.html', {'form': form})
