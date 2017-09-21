@@ -99,7 +99,7 @@ class UserFormView(View):
         # password = request.cleaned_data['password']
 
         # returns User objects if credentials are correct
-        user = authenticate(request, username=email, password=password)
+        user = authenticate(request, email=email, password=password)
 
         if user is not None:
             print("User is authenticated")
@@ -178,7 +178,7 @@ def register_patient(request):
             gp = form.cleaned_data.get('general_practitioner')
             add_general_practitioner(user.patient, gp)
             print("User saved")
-            user = authenticate(request, username=request.POST['email'], password=request.POST['password1'])
+            user = authenticate(request, email=request.POST['email'], password=request.POST['password1'])
             print("User authenticated")
             login(request, user)
             print("User logged in")
@@ -209,7 +209,7 @@ def register_doctor(request):
             user._type = 'D'  # Tip na user
             user.save()
             print("User saved")
-            user = authenticate(request, username=request.POST['email'], password=request.POST['password1'])
+            user = authenticate(request, email=request.POST['email'], password=request.POST['password1'])
             print("User authenticated")
             login(request, user)
             print("User logged in")

@@ -9,6 +9,7 @@ from login.models import Doctor
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)  # the widget will hide the password from the user
 
+
     class Meta:
         model = User
         # fields = ['username', 'email', 'password']
@@ -43,4 +44,4 @@ class DoctorRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('name', 'email', 'surname', 'doctor_id', 'is_general_practitioner')
+        fields = ('name', 'surname', 'email', 'doctor_id', 'is_general_practitioner')

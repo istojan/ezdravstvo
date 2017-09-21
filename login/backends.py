@@ -10,12 +10,12 @@ class LoginUsingEmailAsUsernameBackend(object):
   supports_anonymous_user = False
   supports_inactive_user = False
 
-  def authenticate(self, username=None, password=None):
+  def authenticate(self, email=None, password=None):
     print("\n\nUsing custom authenticate function.\n\n")
 
     try:
       # Check if the user exists in Django's database
-      user = User.objects.get(email=username)
+      user = User.objects.get(email=email)
     except User.DoesNotExist:
       return None
 

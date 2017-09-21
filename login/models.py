@@ -9,7 +9,7 @@ from django.db import models
 #
 # - ime
 # - adresa
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 
 
 class Hospital(models.Model):
@@ -138,5 +138,12 @@ def create_profile(sender, **kwargs):
             user.doctor.save()
             print("Saving user.doctor")
 
+
+def set_username(sender, **kwargs):
+    user = kwargs['instance']
+    user.username = user.email
+
+
+pre_save.connect(set_username, sender=User)
 
 post_save.connect(create_profile, sender=User)
