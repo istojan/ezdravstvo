@@ -32,7 +32,7 @@ class Doctor(models.Model):
     doctor_id = models.CharField(max_length=6)
     # Dali e matichen doktor
     is_general_practitioner = models.BooleanField(default=False)
-    hospital = models.ForeignKey(Hospital, null=True, on_delete=models.SET_NULL)
+    hospital = models.ForeignKey(Hospital, blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return "Dr. %s %s" % (self.name, self.surname)
@@ -52,14 +52,14 @@ class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
     surname = models.CharField(max_length=30)
-    ssn = models.CharField(max_length=13, unique=True, validators=[
+    ssn = models.CharField(max_length=13, validators=[
         RegexValidator(regex='^[0-9]{13}$', message='SSN must be 13 digits', code='nomatch')
     ])
     email = models.EmailField(null=True, default=None)
     date_of_birth = models.DateField()
     address = models.CharField(max_length=30)
     # Matichen doktor
-    general_practitioner = models.ForeignKey(Doctor, null=True, on_delete=models.SET_NULL)
+    general_practitioner = models.ForeignKey(Doctor, blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return "%s %s" % (self.name, self.surname)
@@ -114,21 +114,29 @@ class Report(models.Model):
 
 
 def create_profile(sender, **kwargs):
+    print("Creating profile")
     user = kwargs['instance']
     if user.is_superuser:
         return
     if kwargs['created']:
+        print("created == True")
         if hasattr(user, '_type'):
+            print("Has _type")
             if user._type == 'P':
                 patient = Patient(user=user)
                 patient.save()
+                print("Saving patient")
             elif user._type == 'D':
                 doctor = Doctor(user=user)
                 doctor.save()
+                print("Saving doctor")
     if hasattr(user, '_type'):
         if user._type == 'P':
             user.patient.save()
+            print("Saving user.patient")
         elif user._type == 'D':
             user.doctor.save()
+            print("Saving user.doctor")
+
 
 post_save.connect(create_profile, sender=User)
