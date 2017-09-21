@@ -55,7 +55,7 @@ class Patient(models.Model):
     ssn = models.CharField(max_length=13, validators=[
         RegexValidator(regex='^[0-9]{13}$', message='SSN must be 13 digits', code='nomatch')
     ])
-    email = models.EmailField(null=True, default=None)
+    # email = models.EmailField(null=True, default=None)
     date_of_birth = models.DateField()
     address = models.CharField(max_length=30)
     # Matichen doktor
