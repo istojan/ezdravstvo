@@ -12,11 +12,11 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         # fields = ['username', 'email', 'password']
-        fields = ['username', 'password']
-        help_texts = {
-            'username': None,
-            'email': None,
-        }
+        fields = ['email', 'password']
+        # help_texts = {
+        #     'username': None,
+        #     'email': None,
+        # }
 
 
 class PatientRegistrationForm(UserCreationForm):
@@ -31,7 +31,7 @@ class PatientRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'name', 'surname', 'ssn', 'date_of_birth', 'address', 'email', 'password1', 'password2',
+        fields = ('name', 'surname', 'ssn', 'date_of_birth', 'address', 'email', 'password1', 'password2',
                   'general_practitioner')
 
 
@@ -43,4 +43,4 @@ class DoctorRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'name', 'surname', 'doctor_id', 'is_general_practitioner')
+        fields = ('name', 'email', 'surname', 'doctor_id', 'is_general_practitioner')
