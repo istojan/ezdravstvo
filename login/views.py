@@ -6,13 +6,14 @@ from django.contrib.auth import (
 )
 
 from django.shortcuts import render, redirect, reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 # from .forms import UserLoginForm
 from django.views.generic import View
 from django.contrib.auth.decorators import login_required
 
 from login.models import Patient, Doctor
 from .forms import UserForm, PatientRegistrationForm, DoctorRegistrationForm
+from .utils import add_general_practitioner
 
 
 # Create your views here.
@@ -174,6 +175,8 @@ def register_patient(request):
             user.patient.email = form.cleaned_data.get('email')
             user._type = 'P'  # Tip na user
             user.save()
+            gp = form.cleaned_data.get('general_practitioner')
+            add_general_practitioner(user.patient, gp)
             print("User saved")
             user = authenticate(request, username=request.POST['username'], password=request.POST['password1'])
             print("User authenticated")

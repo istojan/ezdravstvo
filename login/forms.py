@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import SelectDateWidget
 
+from login.models import Doctor
+
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)  # the widget will hide the password from the user
@@ -24,10 +26,13 @@ class PatientRegistrationForm(UserCreationForm):
     date_of_birth = forms.DateField(widget=SelectDateWidget(years=range(1900, 2017)))
     address = forms.CharField(max_length=30)
     email = forms.EmailField()
+    general_practitioner = forms.ModelChoiceField(required=False,
+                                                  queryset=Doctor.objects.filter(is_general_practitioner=True))
 
     class Meta:
         model = User
-        fields = ('username', 'name', 'surname', 'ssn', 'date_of_birth', 'address', 'email', 'password1', 'password2')
+        fields = ('username', 'name', 'surname', 'ssn', 'date_of_birth', 'address', 'email', 'password1', 'password2',
+                  'general_practitioner')
 
 
 class DoctorRegistrationForm(UserCreationForm):
