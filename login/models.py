@@ -131,5 +131,4 @@ def create_profile(sender, **kwargs):
         elif user._type == 'D':
             user.doctor.save()
 
-
 post_save.connect(create_profile, sender=User)

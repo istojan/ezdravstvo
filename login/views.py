@@ -89,6 +89,7 @@ class UserFormView(View):
         print(username)
         print(password)
 
+
         # username = form.cleaned_data['username']
         # password = form.cleaned_data['password']
 
@@ -120,7 +121,22 @@ def homepage(request):
         print("User has been already authenticated")
         # print(request.user.get_username())
         # print(request.user.email)
-        return render(request, 'login/homepage.html', {'username': request.user.get_username(), 'email': request.user.email, 'password': request.user.password})
+
+        try:
+            if request.user.doctor:    # This will throw an error if its a doctor
+                print("This is a doctor")
+            # return homepage for doctor
+            return render(request, 'login/homepage_doctor.html',
+                          {'username': request.user.get_username(),
+                           'password': request.user.password, 'doc_ID': request.user.doctor.doctor_id})
+        except:
+            # This is not a patient
+            print("This is a patient. Error has been catched")
+            # return homepage for patient
+            return render(request, 'login/homepage.html',
+                          {'username': request.user.get_username(), 'email': request.user.email,
+                           'password': request.user.password, 'ssn': request.user.patient.ssn})
+
     else:
         print("User has not been authenticated")
         return HttpResponseRedirect(reverse('login:index')) # request to default page if no user is logged in
@@ -139,31 +155,6 @@ def logout_view(request):
     return HttpResponseRedirect(reverse('login:index'))
 
 
-# def logout_view(request):
-#     logout(request)
-#
-#     return HttpResponseRedirect(reverse('login:index'))
-
-# def login_view(request):
-#     form = UserLoginForm(request.POST or None)
-#
-#     if form.is_valid():
-#         username = form.cleaned_data.get("username")
-#         password = form.cleaned_data.get("password")
-#
-#
-#
-#     return render(request, "form.html", {"form":form })
-
-
-# def register_view(request):
-#     return render(request, "form.html", {})
-#
-#
-# def logout_view(request):
-#     return render(request, "form.html", {})
-
-
 # View for patient registration
 def register_patient(request):
     if request.method == 'POST':
@@ -178,6 +169,7 @@ def register_patient(request):
             user.patient.surname = form.cleaned_data.get('surname')
             user.patient.ssn = form.cleaned_data.get('ssn')
             user.patient.date_of_birth = form.cleaned_data.get('date_of_birth')
+            print(" Date of birth: ", form.cleaned_data.get('date_of_birth'))
             user.patient.address = form.cleaned_data.get('address')
             user.patient.email = form.cleaned_data.get('email')
             user._type = 'P'  # Tip na user
@@ -211,7 +203,7 @@ def register_doctor(request):
             is_general_practitioner = form.cleaned_data.get('is_general_practitioner')
             user.doctor = Doctor(name=name, surname=surname, doctor_id=doctor_id,
                                  is_general_practitioner=is_general_practitioner)
-            user._type = 'D'
+            user._type = 'D'  # Tip na user
             user.save()
             print("User saved")
             user = authenticate(request, username=request.POST['username'], password=request.POST['password1'])
