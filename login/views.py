@@ -61,11 +61,9 @@ def homepage(request):
                 print("This is a doctor")
 
             # return homepage for doctor
-            return render(request, 'login/homepage_doctor.html',
-                          {'username': request.user.get_username(),
-                           'password': request.user.password, 'doc_ID': request.user.doctor.doctor_id})
-        except:
-            print("This is a patient. Error has been catched")
+            return redirect('doctor:homepage_doc', doctor_id=request.user.doctor.id)
+
+        except Exception as e:
             # return homepage for patient
             return redirect('patient:homepage', patient_id=request.user.id)
 
