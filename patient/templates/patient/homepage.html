@@ -2,23 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Лични информации</title>
 </head>
 <body>
-    <h5>Лични информации</h5>
+    <h3>Лични информации</h3>
     <div>
-        Име: <b></b><br/>
-        Презиме: <b></b><br/>
-        Матичен број: <b></b><br/>
-        Датум на раѓање: <b></b><br/>
-        Адреса: <b></b><br/>
-        Матичен доктор: <b></b><br/>
+        Име: <b>{{ patient.name }}</b><br/>
+        Презиме: <b>{{ patient.surname }}</b><br/>
+        Матичен број: <b>{{ patient.ssn }}</b><br/>
+        Датум на раѓање: <b>{{ patient.date_of_birth }}</b><br/>
+        Адреса на живеење: <b>{{ patient.address }}</b><br/>
+        email: <b>{{ patient.user.email }}</b><br/>
+        Матичен доктор: <b>{{ patient.general_practitioner }}</b><br/>
     </div>
 
-    <button>
-        <a href="{% url 'login:logout_user' %}">
-            Logout
-        </a>
-    </button>
+    <a href="{% url 'patient:old_appointments' patient.user.id %}">Стари термини</a> <br/>
+    <a href="{% url 'patient:upcoming_appointments' patient.user.id %}">Закажани термини</a> <br/>
+    <a href="{% url 'login:logout_user' %}">Одјави се</a><br/>
 </body>
 </html>

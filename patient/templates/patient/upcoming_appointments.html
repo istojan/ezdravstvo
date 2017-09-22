@@ -2,9 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Upcoming appointments</title>
+    <title>Закажани термини</title>
 </head>
 <body>
-    {{ patient_id }}
+<h3>Закажани термини на {{ patient.name }} {{ patient.surname }}</h3>
+{% if appointments.count == 0 %}
+    <div>
+        <i>Немате закажани термини.</i>
+    </div>
+{% else %}
+    <ul>
+        {% for appointment in appointments %}
+            <li>
+                <div style="border: solid; color: mediumaquamarine;">
+                    Број на термин: <b>{{ appointment.appointment_number }}</b><br/>
+                    Доктор: <b>{{ appointment.doctor }}</b><br/>
+                    Датум: <b>{{ appointment.date }}</b><br/>
+                    Време: <b>{{ appointment.time }}</b><br/>
+                    <span style="color: grey"><i>Извештај</i></span>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
 </body>
 </html>

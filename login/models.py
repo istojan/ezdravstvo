@@ -99,6 +99,9 @@ class Appointment(models.Model):
     # Verojatno e podobro da bide so DateTimeFiled
     # date_time = models.DateTimeField()
 
+    def __str__(self):
+        return "%s -- %s -- %s" % (self.patient, self.doctor, self.date)
+
 
 # IZVESHTAJ
 #
@@ -111,6 +114,9 @@ class Report(models.Model):
     diagnosis = models.CharField(max_length=200)
     therapy = models.CharField(max_length=200)
     remark = models.CharField(max_length=300)
+
+    def __str__(self):
+        return "Извештај: %s" % self.appointment
 
 
 def create_profile(sender, **kwargs):

@@ -2,9 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Old appointments</title>
+    <title>Стари термини</title>
 </head>
 <body>
-    {{ patient_id }}
+<h3>Термини на {{ patient.name }} {{ patient.surname }}</h3>
+{% if appointments.count == 0 %}
+    <div>
+        <i>Историјата на термини е празна.</i>
+    </div>
+{% else %}
+    <ul>
+        {% for appointment in appointments %}
+            <li>
+                <div style="border: solid; color: mediumaquamarine;">
+                    Број на термин: <b>{{ appointment.appointment_number }}</b><br/>
+                    Доктор: <b>{{ appointment.doctor }}</b><br/>
+                    Датум: <b>{{ appointment.date }}</b><br/>
+                    Време: <b>{{ appointment.time }}</b><br/>
+                    {% if appointment.report.pk %}
+                        <a href="{% url 'patient:appointment_details' appointment.report.pk %}">Извештај</a>
+                    {% else %}
+                        Извештај<span style="color: grey"><i>(Нема извештај)</i></span>
+                    {% endif %}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
 </body>
 </html>

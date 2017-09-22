@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Извештај #{{ report.id }}</title>
+</head>
+<body>
+<h2>Извештај #{{ report.id }}</h2>
+<div>
+    Пациент: <b>{{ report.appointment.patient }}</b><br/>
+    Доктор: <b>{{ report.appointment.doctor }}</b><br/>
+    Датум: <b>{{ report.appointment.date }}</b><br/>
+</div>
+<h4>Резултати од прегледот</h4>
+<h5>Дијагноза</h5>
+<div>
+    {{ report.diagnosis }}
+</div>
+<h5>Терапија</h5>
+<div>
+    {{ report.therapy }}
+</div>
+<h5>Забелешка</h5>
+<div>
+    {{ report.remark }}
+</div>
+</body>
+</html>
