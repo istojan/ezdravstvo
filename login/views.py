@@ -67,9 +67,7 @@ def homepage(request):
         except:
             print("This is a patient. Error has been catched")
             # return homepage for patient
-            return render(request, 'login/homepage.html',
-                          {'username': request.user.get_username(), 'email': request.user.email,
-                           'password': request.user.password, 'ssn': request.user.patient.ssn})
+            return redirect('patient:homepage', patient_id=request.user.id)
 
     else:
         print("User has not been authenticated")
