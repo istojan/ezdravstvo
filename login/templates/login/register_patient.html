@@ -3,8 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Patient</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
+<script>
+    $(document).ready(function () {
+        $('#id_general_practitioner').html("")
+    });
+
+    function get_doctors() {
+        var hospital_ddl = $('#id_hospital');
+        var selected = hospital_ddl.find(":selected").val();
+        var doctor_ddl = $('#id_general_practitioner');
+        console.log(selected);
+        $.ajax({
+            url: '/ajax/get_gps_for_hospital/',
+            data: {
+                'hospital_id': selected
+            },
+            dataType: 'json',
+            success: function (data) {
+                var html_text = "";
+                for (var i = 0; i < data.length; i++) {
+                    var doc = data[i];
+                    var id = doc['id'];
+                    var name = doc['name'];
+                    var option = "<option value=\"" + id + "\">" + name + "</option>" + "<br/>";
+                    html_text += option;
+                }
+                doctor_ddl.html(html_text)
+            }
+        })
+    }
+</script>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
