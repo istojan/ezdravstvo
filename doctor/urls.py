@@ -6,11 +6,10 @@ app_name = 'doctor'
 urlpatterns = [
     url(r'^doctor/(?P<doctor_id>[0-9]+)/$', views.homepage, name='homepage_doc'),
     url(r'^doctor/(?P<doctor_id>[0-9]+)/makeappointment/$', views.MakeAppointmentView.as_view(), name='make_appointment'),
+    url(r'^doctor/(?P<doctor_id>[0-9]+)/patients$', views.PatientsPreviewView.as_view(), name='patients_preview'),
     url(r'^ajax/get_times_available/$', views.get_times_available, name='times_available'),
-    url(r'^doctor/(?P<doctor_id>[0-9]+)/patients$', views.PatientsPreviewView.as_view(), name='patients_preview')
-    # url(r'^patient/(?P<patient_id>[0-9]+)/homepage/$', views.homepage, name='homepage'),
-    # url(r'^patient/(?P<patient_id>[0-9]+)/oldAppointments/$', views.old_appointments, name='old_appointments'),
-    # url(r'^patient/(?P<patient_id>[0-9]+)/upcomingAppointments', views.upcoming_appointments, name='upcoming_appointments'),
+    url(r'^ajax/remove_self_as_gp/$', views.remove_self_as_gp, name='remove_self_as_gp'),
+    url(r'^ajax/add_self_as_gp/$', views.add_self_as_gp, name='add_self_as_gp')
 ]
 
 # /ajax/get_times_available/

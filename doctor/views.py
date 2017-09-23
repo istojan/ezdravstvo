@@ -110,8 +110,7 @@ class MakeAppointmentView(View):
             appointment = Appointment(doctor=form.cleaned_data.get('doctor'),
                                       patient=form.cleaned_data.get('patient'),
                                       date=date,
-                                      time=form.cleaned_data.get('time2')
-                                      )
+                                      time=form.cleaned_data.get('time2'))
             appointment.save()
             print("App saved")
             return redirect('/doctor/' + str(request.user.id) + '/')
@@ -119,40 +118,6 @@ class MakeAppointmentView(View):
             print("Invalid form")
 
         return render(request, self.template_name, {'form': form})
-
-# class DoctorRegistrationView(View):
-#     form_class = DoctorRegistrationForm
-#     template_name = 'login/register_doctor.html'
-#
-#     def get(self, request):
-#         form = self.form_class(None)
-#         return render(request, self.template_name, {'form': form})
-#
-#     def post(self, request):
-#         form = self.form_class(request.POST)
-#         print('Method = POST')
-#
-#         if form.is_valid():
-#             print("Valid form")
-#             user = form.save()
-#             user.refresh_from_db()
-#
-#             user.doctor = Doctor(name=form.cleaned_data.get('name'), surname=form.cleaned_data.get('surname'),
-#                                  doctor_id=form.cleaned_data.get('doctor_id'),
-#                                  is_general_practitioner=form.cleaned_data.get('is_general_practitioner'))
-#             user._type = 'D'  # Tip na user
-#             user.save()
-#             hospital = form.cleaned_data.get('hospital')
-#             add_hospital(user.doctor, hospital)
-#             print("User saved")
-#             user = authenticate(request, email=request.POST['email'], password=request.POST['password1'])
-#             print("User authenticated")
-#             login(request, user)
-#             print("User logged in")
-#             return redirect('login:homepage')
-#
-#         print("Invalid form")
-#         return render(request, self.template_name, {'form': form})
 
 class PatientsPreviewView(View):
     template_name = 'doctor/patients_preview.html'
