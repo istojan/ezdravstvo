@@ -134,7 +134,7 @@ def remove_self_as_gp(request):
                 response = "Success"
         except Patient.DoesNotExist:
             response = "Failure"
-    return JsonResponse(response)
+    return JsonResponse({'response': response})
 
 
 def add_self_as_gp(request):
@@ -150,4 +150,4 @@ def add_self_as_gp(request):
                 response = "Success"
         except Patient.DoesNotExist:
             response = "Failure"
-    return JsonResponse(response)
+    return JsonResponse({'response': response})
