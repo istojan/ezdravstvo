@@ -94,13 +94,65 @@ class MakeAppointmentView(View):
         # context = {
         #     'doctor_id': request.user.doctor.doctor_id
         # }
-        form = self.form_class(request.user.doctor.doctor_id)
+        form = self.form_class(doctor_id = request.user.doctor.doctor_id)
 
         return render(request, self.template_name, {'form': form})
 
-    def post(self, request):
-        pass
+    def post(self, request, doctor_id):
+        form = self.form_class(data=request.POST)
 
+        if form.is_valid():
+            print(form.cleaned_data.get('doctor').id)
+            print(form.cleaned_data.get('patient'))
+            date = str(form.cleaned_data.get('date2')).split(' ')[0]
+            print(date)
+            print(form.cleaned_data.get('time2'))
+            appointment = Appointment(doctor=form.cleaned_data.get('doctor'),
+                                      patient=form.cleaned_data.get('patient'),
+                                      date=date,
+                                      time=form.cleaned_data.get('time2')
+                                      )
+            appointment.save()
+            print("App saved")
+            return redirect('/doctor/' + str(request.user.id) + '/')
+        else:
+            print("Invalid form")
+
+        return render(request, self.template_name, {'form': form})
+
+# class DoctorRegistrationView(View):
+#     form_class = DoctorRegistrationForm
+#     template_name = 'login/register_doctor.html'
+#
+#     def get(self, request):
+#         form = self.form_class(None)
+#         return render(request, self.template_name, {'form': form})
+#
+#     def post(self, request):
+#         form = self.form_class(request.POST)
+#         print('Method = POST')
+#
+#         if form.is_valid():
+#             print("Valid form")
+#             user = form.save()
+#             user.refresh_from_db()
+#
+#             user.doctor = Doctor(name=form.cleaned_data.get('name'), surname=form.cleaned_data.get('surname'),
+#                                  doctor_id=form.cleaned_data.get('doctor_id'),
+#                                  is_general_practitioner=form.cleaned_data.get('is_general_practitioner'))
+#             user._type = 'D'  # Tip na user
+#             user.save()
+#             hospital = form.cleaned_data.get('hospital')
+#             add_hospital(user.doctor, hospital)
+#             print("User saved")
+#             user = authenticate(request, email=request.POST['email'], password=request.POST['password1'])
+#             print("User authenticated")
+#             login(request, user)
+#             print("User logged in")
+#             return redirect('login:homepage')
+#
+#         print("Invalid form")
+#         return render(request, self.template_name, {'form': form})
 
 class PatientsPreviewView(View):
     template_name = 'doctor/patients_preview.html'
@@ -134,7 +186,7 @@ def remove_self_as_gp(request):
                 response = "Success"
         except Patient.DoesNotExist:
             response = "Failure"
-    return JsonResponse(response)
+    return JsonResponse({'response': response})
 
 
 def add_self_as_gp(request):
@@ -150,4 +202,4 @@ def add_self_as_gp(request):
                 response = "Success"
         except Patient.DoesNotExist:
             response = "Failure"
-    return JsonResponse(response)
+    return JsonResponse({'response': response})

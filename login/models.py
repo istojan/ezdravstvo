@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
+import uuid
 
 # TODO - Referencijalniot integritet - Shto da se brishe i kako da se odnesuvaat redovite pri brishenje
 
@@ -94,7 +95,7 @@ class Specialization(models.Model):
 # datum
 # chas
 class Appointment(models.Model):
-    appointment_number = models.IntegerField(unique=True)
+    appointment_number = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     patient = models.ForeignKey(Patient, on_delete=models.DO_NOTHING)
     doctor = models.ForeignKey(Doctor, on_delete=models.DO_NOTHING)
     date = models.DateField()
