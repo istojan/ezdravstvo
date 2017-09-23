@@ -1,11 +1,58 @@
-from django.shortcuts import render
+from django.contrib.auth import (
+    authenticate,
+    get_user_model,
+    login,
+    logout,
+)
 
-# Create your views here.
+from django.shortcuts import render, redirect, reverse
+from django.http import HttpResponseRedirect
+# from .forms import UserLoginForm
+from django.views.generic import View
+from django.contrib.auth.decorators import login_required
+
+from login.models import Patient, Doctor, Appointment
+from doctor.forms import AppointmentForm
+
+# from .forms import UserForm, PatientRegistrationForm, DoctorRegistrationForm
+# from .utils import add_general_practitioner
 
 
-# @login_required(login_url='login:index')  # With this, if no user is logged in, than you will be redirected to the login page
+@login_required(login_url='login:index')  # With this, if no user is logged in, than you will be redirected to the login page
 def homepage(request, doctor_id):
     # print("\n\n\n We are now in doctor homepage view \n\n\n")
-    return render(request, 'doctor/homepage_doctor.html',
-                  {'username': request.user.get_username(),
-                   'password': request.user.password, 'doc_ID': request.user.doctor.doctor_id})
+
+    # need to do a patient count for the specific doctor
+    patient_count = 0
+
+    # patients = Patient.objects.filter(doctor__doctor)
+    # appointments = Appointment.objects.get
+    # appointments = Appointment.objects.filter(doctor__doctor_id=doctor_id).filter(date < datetime.date.today())
+
+
+    context = {
+        'patient_count': patient_count,
+        'username': request.user.get_username(),
+        'password': request.user.password,
+        'doc_ID': request.user.doctor.doctor_id
+    }
+
+    return render(request, 'doctor/homepage_doctor.html', context)
+
+
+class MakeAppointmentView(View):
+    form_class = AppointmentForm
+    template_name = 'doctor/appointment.html'
+
+    def get(self, request, doctor_id):
+        # doctor_id can be removed from the url here
+
+        # context = {
+        #     'doctor_id': request.user.doctor.doctor_id
+        # }
+        form = self.form_class(request.user.doctor.doctor_id)
+
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        pass

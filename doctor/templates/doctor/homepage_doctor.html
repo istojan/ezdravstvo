@@ -34,7 +34,11 @@
     </div>
 
     <div>
-
+        <button>
+        <a href="{% url 'doctor:make_appointment' doctor_id=request.user.doctor.doctor_id %}">
+            Make appointment
+        </a>
+    </button>
 
 
     </div>
