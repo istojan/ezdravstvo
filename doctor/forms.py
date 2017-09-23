@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms import SelectDateWidget
 
 from login.models import Doctor, Patient, Appointment
-from doctor.utils import get_list_dates, get_apps_for_date
+from doctor.utils import get_list_dates, get_apps_times_for_date
 import datetime
 
 
@@ -22,17 +22,18 @@ class AppointmentForm(forms.ModelForm):
         self.fields['patient'] = forms.ModelChoiceField(label="Пациент", required=True, queryset=Patient.objects.filter(general_practitioner__doctor_id=self.doctor_id))
 
         choices_dates = get_list_dates(14)
-        choices_times = get_apps_for_date('date')
+        choices_times = get_apps_times_for_date('date')
 
         self.fields['date2'] = forms.ChoiceField(
             label="Датум",
-            choices=choices_dates
+            choices=choices_dates,
+            widget=forms.Select(attrs={'onchange': 'make_change()'})
         )
 
-        self.fields['time2'] = forms.ChoiceField(
-            label="Термин",
-            choices=choices_times
-        )
+        # self.fields['time2'] = forms.ChoiceField(
+        #     label="Термин",
+        #     choices=choices_times
+        # )
 
     class Meta:
         model = Appointment
