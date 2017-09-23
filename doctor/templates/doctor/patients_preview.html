@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Пациенти</title>
+</head>
+<body>
+<h3>Пациенти на {{ doctor.name }} {{ doctor.surname }}</h3>
+<h2>Матични пациенти:</h2>
+<ul>
+    {% for patient in doctors_patients %}
+        <li>{{ patient }}</li>
+    {% endfor %}
+</ul>
+<h2>Пациенти без матичен доктор:</h2>
+<ul>
+    {% for patient in patients_without_gp %}
+        <li>{{ patient }}</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
