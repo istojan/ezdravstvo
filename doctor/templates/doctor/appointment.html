@@ -3,12 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <title>Appointment</title>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
 </head>
 <body>
-    <form method="post">
+    <form id= "app_form_id" method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Make Appointment</button>
     </form>
+
+    <script>
+
+        function make_change(){
+            console.log("YEAH, this function is called. I am gonna retrieve available times for apps for the chosen date.")
+
+
+            var date_selected = $('#id_date2').find(":selected").text();
+            var date_parsed = date_selected.split('-');
+            var year = date_parsed[0]
+            var month = date_parsed[1]
+            var day = date_parsed[2]
+
+
+            var doctor_selected = $('#id_doctor').find(":selected").text();
+            var patient_selected = $('#id_patient').find(":selected").text();
+
+
+            console.log("Value of selected date is " + date_parsed)
+            console.log("Year is " + date_parsed[0])
+            console.log("Value of selected doctor is " + doctor_selected)
+            console.log("Value of selected patient is " + patient_selected)
+
+
+            $.ajax({
+                url: '/ajax/get_times_available/',
+                data: {
+                    'year': year,
+                    'month': month,
+                    'day': day,
+                    'doctor': doctor_selected,
+                    'patient': patient_selected
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log("Ajax function finished successfully")
+                    console.log(data)
+{#                  if (data.is_taken) {#}
+{#                    alert("A user with this username already exists.");#}
+{#                  }#}
+                }
+              });
+
+
+            $('#id_time2').append($('<option>', {
+                value: 5,
+                text: '20:40'
+            }));
+
+            console.log("Finished adding values")
+        }
+
+
+    </script>
 </body>
 </html>

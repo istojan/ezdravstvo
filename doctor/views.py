@@ -13,6 +13,8 @@ from django.contrib.auth.decorators import login_required
 
 from login.models import Patient, Doctor, Appointment
 from doctor.forms import AppointmentForm
+from django.http import JsonResponse
+
 
 # from .forms import UserForm, PatientRegistrationForm, DoctorRegistrationForm
 # from .utils import add_general_practitioner
@@ -36,8 +38,26 @@ def homepage(request, doctor_id):
         'password': request.user.password,
         'doc_ID': request.user.doctor.doctor_id
     }
-
     return render(request, 'doctor/homepage_doctor.html', context)
+
+
+@login_required(login_url='login:index')  # With this, if no user is logged in, than you will be redirected to the login page
+def get_times_available(request):
+    year = request.GET.get('year', None)
+    month = request.GET.get('month', None)
+    day = request.GET.get('day', None)
+    doctor = request.GET.get('doctor', None)
+    # patient = request.GET.get('year', None)
+    print("Year " + year)
+    print("Doctor " + doctor)
+
+    data = {
+        'is_taken': True
+    }
+    return JsonResponse(data)
+
+    # return render(request, 'doctor/homepage_doctor.html')
+
 
 
 class MakeAppointmentView(View):
