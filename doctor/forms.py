@@ -22,13 +22,25 @@ class AppointmentForm(forms.ModelForm):
         self.fields['patient'] = forms.ModelChoiceField(label="Пациент", required=True, queryset=Patient.objects.filter(general_practitioner__doctor_id=self.doctor_id))
 
         choices_dates = get_list_dates(14)
-        choices_times = get_apps_times_for_date('date')
+        # choices_times = get_apps_times_for_date()
 
         self.fields['date2'] = forms.ChoiceField(
             label="Датум",
             choices=choices_dates,
             widget=forms.Select(attrs={'onchange': 'make_change()'})
         )
+
+        queryset = Doctor.objects.filter(is_general_practitioner=False)
+
+        for q in queryset:
+            print(q)
+            print("  doc_id =  " +  str(q.doctor_id) + "   doc_pk = " + str(q.id))
+
+        queryset = Patient.objects.filter(general_practitioner__doctor_id=self.doctor_id)
+
+        for q in queryset:
+            print(q)
+            print("  patient_pk = " + str(q.id))
 
         # self.fields['time2'] = forms.ChoiceField(
         #     label="Термин",

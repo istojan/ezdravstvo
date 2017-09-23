@@ -27,13 +27,13 @@
             var day = date_parsed[2]
 
 
-            var doctor_selected = $('#id_doctor').find(":selected").text();
+            var doctor_selected = $('#id_doctor').val(); {# returns primary key of doctor  #}
             var patient_selected = $('#id_patient').find(":selected").text();
 
 
             console.log("Value of selected date is " + date_parsed)
             console.log("Year is " + date_parsed[0])
-            console.log("Value of selected doctor is " + doctor_selected)
+            console.log("Primary Key of selected doctor is " + doctor_selected)
             console.log("Value of selected patient is " + patient_selected)
 
 
@@ -49,18 +49,17 @@
                 dataType: 'json',
                 success: function (data) {
                     console.log("Ajax function finished successfully")
-                    console.log(data)
-{#                  if (data.is_taken) {#}
-{#                    alert("A user with this username already exists.");#}
-{#                  }#}
+                    console.log(data.times)
+
+                    data.times.forEach(function (element) {
+                       console.log(element[1]);
+                       $('#id_time2').append($('<option>', {
+                            value: element[0],
+                            text: element[1]
+                       }));
+                    });
                 }
               });
-
-
-            $('#id_time2').append($('<option>', {
-                value: 5,
-                text: '20:40'
-            }));
 
             console.log("Finished adding values")
         }

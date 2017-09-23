@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from login.models import Patient, Doctor, Appointment
 from doctor.forms import AppointmentForm
 from django.http import JsonResponse
+from doctor.utils import get_apps_times_for_date
 
 
 # from .forms import UserForm, PatientRegistrationForm, DoctorRegistrationForm
@@ -47,17 +48,42 @@ def get_times_available(request):
     month = request.GET.get('month', None)
     day = request.GET.get('day', None)
     doctor = request.GET.get('doctor', None)
-    # patient = request.GET.get('year', None)
     print("Year " + year)
     print("Doctor " + doctor)
 
+    list_all_times = get_apps_times_for_date()
+
+    apps = Appointment.objects.filter(doctor__id=doctor).filter(date__day=day, date__month=month, date__year=year)
+    print("There are " + str(len(apps)) + " apps on that date\n\n\n\n\n")
+
+    for app in apps:
+        print(app)
+        print(app.doctor.id)
+        print("App hour: " + str(app.time.hour))
+        print("App min: " + str(app.time.minute))
+
+    times_free_list = list()
+
+    # Malce e shabanski, ama fuck it
+    for time in list_all_times:
+        tmp = time[1].split(':')    # parse hour and min from string object
+        hour = int(tmp[0])
+        min = int(tmp[1])
+
+        time_available = True
+
+        for app in apps:
+            if int(app.time.hour) == hour and int(app.time.minute) == min:
+                time_available = False
+                break
+
+        if time_available:
+            times_free_list.append(time)
+
     data = {
-        'is_taken': True
+        'times': times_free_list
     }
     return JsonResponse(data)
-
-    # return render(request, 'doctor/homepage_doctor.html')
-
 
 
 class MakeAppointmentView(View):
