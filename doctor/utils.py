@@ -21,7 +21,7 @@ def get_list_dates(count_days):
     return choices_dates
 
 
-def get_apps_for_date(date):
+def get_apps_times_for_date():
     # find a way to use date
 
     d = datetime.datetime(2014, 5, 12, 8,

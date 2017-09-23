@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^logout/$', views.logout_view, name='logout_user'),
     url(r'^registerPatient/$', views.PatientRegistrationView.as_view(), name='register_patient'),
     url(r'^registerDoctor/$', views.DoctorRegistrationView.as_view(), name='register_doctor'),
+    url(r'^ajax/get_gps_for_hospital/$', views.get_gps_for_hospital, name='get_gps_for_hospital'),
 ]

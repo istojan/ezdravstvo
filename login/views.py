@@ -6,14 +6,14 @@ from django.contrib.auth import (
 )
 
 from django.shortcuts import render, redirect, reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 # from .forms import UserLoginForm
 from django.views.generic import View
 from django.contrib.auth.decorators import login_required
 
 from login.models import Patient, Doctor
 from .forms import UserForm, PatientRegistrationForm, DoctorRegistrationForm
-from .utils import add_general_practitioner
+from .utils import add_general_practitioner, add_hospital
 
 
 class UserFormView(View):
@@ -111,6 +111,17 @@ class PatientRegistrationView(View):
         return render(request, self.template_name, {'form': form})
 
 
+def get_gps_for_hospital(request):
+    hospital_id = request.GET.get('hospital_id', "")
+    data = []
+    if hospital_id != "":
+        doctors = Doctor.objects.filter(hospital__id=hospital_id, is_general_practitioner=True)
+        for doctor in doctors:
+            data.append({'id': doctor.id, 'name': "%s %s" % (doctor.name, doctor.surname)})
+        print(data)
+    return JsonResponse(data, safe=False)
+
+
 class DoctorRegistrationView(View):
     form_class = DoctorRegistrationForm
     template_name = 'login/register_doctor.html'
@@ -133,6 +144,8 @@ class DoctorRegistrationView(View):
                                  is_general_practitioner=form.cleaned_data.get('is_general_practitioner'))
             user._type = 'D'  # Tip na user
             user.save()
+            hospital = form.cleaned_data.get('hospital')
+            add_hospital(user.doctor, hospital)
             print("User saved")
             user = authenticate(request, email=request.POST['email'], password=request.POST['password1'])
             print("User authenticated")
