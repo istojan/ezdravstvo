@@ -120,3 +120,34 @@ class PatientsPreviewView(View):
 
     def post(self, request, doctor_id):
         pass
+
+
+def remove_self_as_gp(request):
+    patient_id = request.GET.get('patient_id', "")
+    response = "Failure"
+    if patient_id != "":
+        try:
+            patient = Patient.objects.get(pk=patient_id)
+            if patient.general_practitioner_id == request.user.doctor.id:
+                patient.general_practitioner = None
+                patient.save()
+                response = "Success"
+        except Patient.DoesNotExist:
+            response = "Failure"
+    return JsonResponse(response)
+
+
+def add_self_as_gp(request):
+    patient_id = request.GET.get('patient_id', "")
+    response = "Failure"
+    if patient_id != "":
+        try:
+            patient = Patient.objects.get(pk=patient_id)
+            if patient.general_practitioner is None:
+                doctor = request.user.doctor
+                patient.general_practitioner = doctor
+                patient.save()
+                response = "Success"
+        except Patient.DoesNotExist:
+            response = "Failure"
+    return JsonResponse(response)
