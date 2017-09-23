@@ -61,7 +61,7 @@ def homepage(request):
                 print("This is a doctor")
 
             # return homepage for doctor
-            return redirect('doctor:homepage_doc', doctor_id=request.user.doctor.id)
+            return redirect('doctor:homepage_doc', doctor_id=request.user.id)
 
         except Exception as e:
             # return homepage for patient

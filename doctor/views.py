@@ -6,7 +6,7 @@ from django.contrib.auth import (
 )
 
 from django.shortcuts import render, redirect, reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 # from .forms import UserLoginForm
 from django.views.generic import View
 from django.contrib.auth.decorators import login_required
@@ -75,4 +75,24 @@ class MakeAppointmentView(View):
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
+        pass
+
+
+class PatientsPreviewView(View):
+    template_name = 'doctor/patients_preview.html'
+
+    def get(self, request, doctor_id):
+        doctor = Doctor.objects.get(user__pk=request.user.id)
+        if not doctor.is_general_practitioner:
+            raise Http404("Не сте матичен доктор!") # TODO Drug view za nematichni doktori
+        doctors_patients = doctor.patient_set.all()
+        patients_without_gp = Patient.objects.filter(general_practitioner=None)
+        context = {
+            'doctor': doctor,
+            'doctors_patients': doctors_patients,
+            'patients_without_gp': patients_without_gp
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, doctor_id):
         pass
