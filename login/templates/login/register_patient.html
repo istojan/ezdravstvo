@@ -7,10 +7,6 @@
 </head>
 <body>
 <script>
-    $(document).ready(function () {
-        $('#id_general_practitioner').html("")
-    });
-
     function get_doctors() {
         var hospital_ddl = $('#id_hospital');
         var selected = hospital_ddl.find(":selected").val();
@@ -36,10 +32,10 @@
         })
     }
 </script>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Register</button>
-    </form>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register</button>
+</form>
 </body>
 </html>

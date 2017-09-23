@@ -93,7 +93,10 @@ class PatientRegistrationView(View):
             print("Valid form")
             user = form.save()
             user.refresh_from_db()
-            user.patient = Patient(name=form.cleaned_data.get('name'), surname=form.cleaned_data.get('surname'), ssn=form.cleaned_data.get('ssn'), date_of_birth=form.cleaned_data.get('date_of_birth'),
+            user.patient = Patient(name=form.cleaned_data.get('name'),
+                                   surname=form.cleaned_data.get('surname'),
+                                   ssn=form.cleaned_data.get('ssn'),
+                                   date_of_birth=form.cleaned_data.get('date_of_birth'),
                                    address=form.cleaned_data.get('address'))
             user._type = 'P'  # Tip na user
             user.save()
