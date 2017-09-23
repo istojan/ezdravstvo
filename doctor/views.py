@@ -48,8 +48,6 @@ def get_times_available(request):
     month = request.GET.get('month', None)
     day = request.GET.get('day', None)
     doctor = request.GET.get('doctor', None)
-    print("Year " + year)
-    print("Doctor " + doctor)
 
     list_all_times = get_apps_times_for_date()
 

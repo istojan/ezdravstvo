@@ -100,7 +100,7 @@ class Appointment(models.Model):
     # date_time = models.DateTimeField()
 
     def __str__(self):
-        return "%s -- %s -- %s" % (self.patient, self.doctor, self.date)
+        return "%s -- %s -- %s -- %s" % (self.patient, self.doctor, self.date, self.time)
 
 
 # IZVESHTAJ

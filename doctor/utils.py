@@ -21,7 +21,7 @@ def get_list_dates(count_days):
     return choices_dates
 
 
-def get_apps_for_date(date):
+def get_apps_times_for_date():
     # find a way to use date
 
     d = datetime.datetime(2014, 5, 12, 8,
@@ -30,7 +30,7 @@ def get_apps_for_date(date):
     choices_times = list()
 
     while d.hour < 16:
-        choices_times.append((d, d.strftime('%H:%M')))
+        choices_times.append(( d.strftime('%H:%M'), d.strftime('%H:%M')))
         d += delta
 
     return choices_times

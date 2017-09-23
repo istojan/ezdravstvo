@@ -19,23 +19,14 @@
         function make_change(){
             console.log("YEAH, this function is called. I am gonna retrieve available times for apps for the chosen date.")
 
-
+            $('#id_time2').empty();
             var date_selected = $('#id_date2').find(":selected").text();
             var date_parsed = date_selected.split('-');
             var year = date_parsed[0]
             var month = date_parsed[1]
             var day = date_parsed[2]
 
-
             var doctor_selected = $('#id_doctor').val(); {# returns primary key of doctor  #}
-            var patient_selected = $('#id_patient').find(":selected").text();
-
-
-            console.log("Value of selected date is " + date_parsed)
-            console.log("Year is " + date_parsed[0])
-            console.log("Primary Key of selected doctor is " + doctor_selected)
-            console.log("Value of selected patient is " + patient_selected)
-
 
             $.ajax({
                 url: '/ajax/get_times_available/',
@@ -52,7 +43,7 @@
                     console.log(data.times)
 
                     data.times.forEach(function (element) {
-                       console.log(element[1]);
+{#                       console.log(element[1]);#}
                        $('#id_time2').append($('<option>', {
                             value: element[0],
                             text: element[1]
