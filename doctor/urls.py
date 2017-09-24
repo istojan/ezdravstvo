@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^doctor/(?P<doctor_id>[0-9]+)/upcomingAppointments/$', views.UpcomingAppointmentsView.as_view(),
         name='upcoming_appointments'),
     url(r'^doctor/(?P<doctor_id>[0-9]+)/(?P<patient_id>[0-9]+)/$', views.patientDetails, name='patientDetails'),
+    url(r'^doctor/(?P<doctor_id>[0-9]+)/appointment/(?P<appointment_id>[0-9]+)/$', views.appointment_details, name='appointment_details'),
     url(r'^ajax/get_times_available/$', views.get_times_available, name='times_available'),
     url(r'^ajax/remove_self_as_gp/$', views.remove_self_as_gp, name='remove_self_as_gp'),
     url(r'^ajax/add_self_as_gp/$', views.add_self_as_gp, name='add_self_as_gp')

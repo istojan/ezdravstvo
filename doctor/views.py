@@ -196,6 +196,14 @@ def add_self_as_gp(request):
     return JsonResponse({'response': response})
 
 
+def appointment_details(request, doctor_id, appointment_id):
+    appointment = Appointment.objects.get(pk=appointment_id)
+    context = {
+        'appointment': appointment
+    }
+    return render(request, 'doctor/appointment_details.html', context)
+
+
 def patientDetails(request, doctor_id, patient_id):
     patient = Patient.objects.get(user__id=patient_id)
     doctors = Appointment.objects.filter(patient__user__id=patient_id)     # list of all doctors that the patinet had a appointment with

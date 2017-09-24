@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Детали</title>
+</head>
+<body>
+<h3>Детали за преглед #{{ appointment.appointment_number }}</h3>
+<div>
+    Пациент: {{ appointment.patient }} <br/>
+    Единствен матичен број: {{ appointment.patient.ssn }} <br/>
+    Број на здравствена легитимација: <i>#TODO</i> <br/>
+    Единствен здравствен број на осигуреникот: <i>#TODO</i> <br/>
+    Прегледот го извршил: {{ appointment.doctor }} <br/>
+    Датум: {{ appointment.date }} <br/>
+    Час: {{ appointment.time }} <br/>
+</div>
+{% if appointment.report %}
+    <div>
+        <h5>Дијагноза</h5>
+        <div>
+            {{ appointment.report.diagnosis }}
+        </div>
+        <h5>Терапија:</h5>
+        <div>
+            {{ appointment.report.therapy }}
+        </div>
+        <h5>Забелешка:</h5>
+        <div>
+            {{ appointment.report.diagnosis }}
+        </div>
+    </div>
+    <div style="color: darkred">
+        <i>Избриши извештај</i>
+    </div>
+{% else %}
+    {% if request.user.doctor.id == appointment.doctor.id %}
+        <div>
+            Додај извештај...
+        </div>
+    {% endif %}
+{% endif %}
+
+</body>
+</html>
