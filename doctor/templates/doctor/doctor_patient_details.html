@@ -56,6 +56,11 @@
     <div>
         {% if patient.general_practitioner is not None and patient.general_practitioner.id == request.user.doctor.id %}
             <button class="doctor_is_gp" id="{{ patient.id }}">Отстрани се како матичен доктор</button>
+            <br> <br> <br>
+            Tuka da stoi edna forma shto kje ima polinja za izveshtaj:  <br>
+            Pri klikanjeto na submit, formata treba da kreira appointment so momentalniot logiran doktor, pacientot shto go pokazhuva, deneshen datum i bez vreme(00:00) <br>
+            Isto treba da kreira izveshtaj so vnesenite informacii.
+
         {% elif patient.general_practitioner is None %}
             <button class="no_gp" id="{{ patient.id }}">Назначи се</button>
         {% endif %}
