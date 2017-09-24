@@ -3,46 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Пациенти</title>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
-<script>
-    $(document).ready(function () {
-        $('.doctor_is_gp').on('click', function () {
-            console.log("My patient " + $(this).attr('id'));
-            $.ajax({
-                url: '{% url 'doctor:remove_self_as_gp' %}',
-                data: {
-                    'patient_id': $(this).attr('id')
-                },
-                dataType: 'json',
-                success: function(response) {
-                    alert(response['response'])
-                }
-            });
-        });
-        $('.no_gp').on('click', function () {
-            console.log("No one's patient " + $(this).attr('id'));
-            $.ajax({
-                url: '{% url 'doctor:add_self_as_gp' %}',
-                data: {
-                    'patient_id': $(this).attr('id')
-                },
-                dataType: 'json',
-                success: function(response) {
-                    alert(response['response'])
-                }
-            });
-        });
-    });
-</script>
+
 <h3>Пациенти на {{ doctor.name }} {{ doctor.surname }}</h3>
 <h2>Матични пациенти:</h2>
 <ul>
     {% for patient in doctors_patients %}
         <li>
             <div>
-                <a href={% url "doctor:patientDetails" request.user.id patient.user.id %}> {{ patient }} </a> <button class="doctor_is_gp" id="{{ patient.id }}">Отстрани се</button>
+                <a href={% url "doctor:patientDetails" request.user.id patient.user.id %}> {{ patient }} </a>
             </div>
         </li>
     {% endfor %}
@@ -52,7 +22,7 @@
     {% for patient in patients_without_gp %}
         <li>
             <div>
-                <a href={% url "doctor:patientDetails" request.user.id patient.user.id %}> {{ patient }} </a> <button class="no_gp" id="{{ patient.id }}">Назначи се</button>
+                <a href={% url "doctor:patientDetails" request.user.id patient.user.id %}> {{ patient }} </a>
             </div>
         </li>
     {% endfor %}
