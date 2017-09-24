@@ -1,6 +1,6 @@
 from django import forms
 
-from login.models import Doctor, Patient, Appointment
+from login.models import Doctor, Patient, Appointment, Report
 from doctor.utils import get_list_dates
 from login.forms import ChoiceFieldNoValidation
 
@@ -39,3 +39,9 @@ class AppointmentForm(forms.ModelForm):
         fields = [
             'doctor', 'patient','date2', 'time2'
         ]
+
+
+class AddReportForm(forms.ModelForm):
+    class Meta:
+        model = Report
+        fields = ['diagnosis', 'therapy', 'remark']

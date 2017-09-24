@@ -3,8 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Детали</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
+<script>
+    $(document).ready(function () {
+         $('#delete_report').on('click', function () {
+             $.ajax({
+                 url: '{% url 'doctor:remove_report' %}',
+                 data: {
+                     'appointment_id': '{{ appointment.id }}'
+                 },
+                 dataType: 'json',
+                 success: function (response) {
+                     alert(response['response'])
+                 }
+             });
+         });
+    });
+</script>
 <h3>Детали за преглед #{{ appointment.appointment_number }}</h3>
 <div>
     Пациент: {{ appointment.patient }} <br/>
@@ -27,16 +44,17 @@
         </div>
         <h5>Забелешка:</h5>
         <div>
-            {{ appointment.report.diagnosis }}
+            {{ appointment.report.remark }}
         </div>
     </div>
-    <div style="color: darkred">
-        <i>Избриши извештај</i>
+    <div style="color: darkred" id="delete_report">
+        <i>ИЗБРИШИ ИЗВЕШТАЈ</i>
     </div>
 {% else %}
     {% if request.user.doctor.id == appointment.doctor.id %}
         <div>
-            Додај извештај...
+            <a href="{% url 'doctor:add_report' doctor_id=appointment.doctor.id appointment_id=appointment.id %}">Додај
+                извештај...</a>
         </div>
     {% endif %}
 {% endif %}

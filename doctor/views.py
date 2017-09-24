@@ -14,7 +14,7 @@ from django.views.generic import View
 from django.contrib.auth.decorators import login_required
 
 from login.models import Patient, Doctor, Appointment
-from doctor.forms import AppointmentForm
+from doctor.forms import AppointmentForm, AddReportForm
 from django.http import JsonResponse
 from doctor.utils import get_apps_times_for_date
 
@@ -165,6 +165,25 @@ class UpcomingAppointmentsView(View):
         pass
 
 
+class AddReportView(View):
+    form_class = AddReportForm
+
+    def get(self, request, doctor_id, appointment_id):
+        form = self.form_class(None)
+        return render(request, 'doctor/add_report.html', {'form': form})
+
+    def post(self, request, doctor_id, appointment_id):
+        try:
+            appointment = Appointment.objects.get(pk=appointment_id)
+            form = self.form_class(request.POST)
+            report = form.save(commit=False)
+            report.appointment = appointment
+            report.save()
+            return redirect('doctor:appointment_details', doctor_id=doctor_id, appointment_id=appointment_id)
+        except Appointment.DoesNotExist:
+            return Http404("Не постои прегледот!")
+
+
 def remove_self_as_gp(request):
     patient_id = request.GET.get('patient_id', "")
     response = "Failure"
@@ -192,6 +211,20 @@ def add_self_as_gp(request):
                 patient.save()
                 response = "Success"
         except Patient.DoesNotExist:
+            response = "Failure"
+    return JsonResponse({'response': response})
+
+
+def remove_report_from_appointment(request):
+    appointment_id = request.GET.get('appointment_id', "")
+    response = "Failure"
+    if appointment_id != "":
+        try:
+            appointment = Appointment.objects.get(pk=appointment_id)
+            appointment.report.delete()
+            appointment.save()
+            response = "Success"
+        except Appointment.DoesNotExist:
             response = "Failure"
     return JsonResponse({'response': response})
 
