@@ -42,7 +42,7 @@
     {% for patient in doctors_patients %}
         <li>
             <div>
-                {{ patient }} <button class="doctor_is_gp" id="{{ patient.id }}">Отстрани се</button>
+                <a href={% url "doctor:patientDetails" request.user.id patient.user.id %}> {{ patient }} </a> <button class="doctor_is_gp" id="{{ patient.id }}">Отстрани се</button>
             </div>
         </li>
     {% endfor %}
@@ -52,7 +52,7 @@
     {% for patient in patients_without_gp %}
         <li>
             <div>
-                {{ patient }} <button class="no_gp" id="{{ patient.id }}">Назначи се</button>
+                <a href={% url "doctor:patientDetails" request.user.id patient.user.id %}> {{ patient }} </a> <button class="no_gp" id="{{ patient.id }}">Назначи се</button>
             </div>
         </li>
     {% endfor %}

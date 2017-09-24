@@ -194,3 +194,26 @@ def add_self_as_gp(request):
         except Patient.DoesNotExist:
             response = "Failure"
     return JsonResponse({'response': response})
+
+
+def patientDetails(request, doctor_id, patient_id):
+    patient = Patient.objects.get(user__id=patient_id)
+    doctors = Appointment.objects.filter(patient__user__id=patient_id)     # list of all doctors that the patinet had a appointment with
+
+    past_appointments = Appointment.objects.filter(patient__user__id=patient_id).exclude(report=None)
+    future_appointments = Appointment.objects.filter(patient__user__id=patient_id).filter(report=None)
+
+    context = {
+        'patient': patient,
+        'past_appointments': past_appointments,
+        'future_appointments': future_appointments
+    }
+
+    if patient.general_practitioner is None or patient.general_practitioner.user.id == int(doctor_id):
+        return render(request, 'doctor/doctor_patient_details.html', context)
+    else:
+        for doctor in doctors:
+            if doctor.user.id == int(doctor_id):
+                return render(request, 'doctor/doctor_patient_details.html', context)
+
+    return Http404("No patient like that")

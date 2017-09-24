@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>Detailed patient view!!!</h1>
+
+    <h2>Лични информации:</h2>
+    <div>
+        Име:     {{ patient.name }}
+    </div>
+    <div>
+        Презиме: {{ patient.surname }}
+    </div>
+    <div>
+        Матичен Доктор:
+        {% if patient.general_practitioner is None %}
+            Нема
+        {% else %}
+            {{ patient.general_practitioner }}
+        {% endif %}
+    </div>
+
+    <h4>Минати прегледи</h4>
+    {% for app in past_appointments %}
+        <li>
+            <a href="">{{ app }}</a>
+        </li>
+    {% endfor %}
+
+    <h4>Идни прегледи</h4>
+    {% for app in future_appointments %}
+        <li>
+            <a href="">{{ app }}</a>
+        </li>
+    {% endfor %}
+</body>
+</html>
