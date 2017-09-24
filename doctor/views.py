@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth import (
     authenticate,
     get_user_model,
@@ -31,7 +33,6 @@ def homepage(request, doctor_id):
     # patients = Patient.objects.filter(doctor__doctor)
     # appointments = Appointment.objects.get
     # appointments = Appointment.objects.filter(doctor__doctor_id=doctor_id).filter(date < datetime.date.today())
-
 
     context = {
         'patient_count': patient_count,
@@ -119,6 +120,7 @@ class MakeAppointmentView(View):
 
         return render(request, self.template_name, {'form': form})
 
+
 class PatientsPreviewView(View):
     template_name = 'doctor/patients_preview.html'
 
@@ -132,6 +134,38 @@ class PatientsPreviewView(View):
             'doctor': doctor,
             'doctors_patients': doctors_patients,
             'patients_without_gp': patients_without_gp
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, doctor_id):
+        pass
+
+
+class OldAppointmentsView(View):
+    template_name = 'doctor/old_appointments.html'
+
+    def get(self, request, doctor_id):
+        doctor = Doctor.objects.get(user__pk=request.user.id)
+        appointments = doctor.appointment_set.filter(date__lt=datetime.date.today())
+        context = {
+            'doctor': doctor,
+            'appointments': appointments
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, doctor_id):
+        pass
+
+
+class UpcomingAppointmentsView(View):
+    template_name = 'doctor/upcoming_appointments.html'
+
+    def get(self, request, doctor_id):
+        doctor = Doctor.objects.get(user__pk=request.user.id)
+        appointments = doctor.appointment_set.exclude(date__lt=datetime.date.today())
+        context = {
+            'doctor': doctor,
+            'appointments': appointments
         }
         return render(request, self.template_name, context)
 

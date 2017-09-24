@@ -45,10 +45,17 @@
             Make appointment
         </a>
     </button>
-
-
 </div>
-
+<button>
+    <a href="{% url 'doctor:old_appointments' doctor_id=request.user.id %}">
+        Стари прегледи
+    </a>
+</button>
+<button>
+    <a href="{% url 'doctor:upcoming_appointments' doctor_id=request.user.id %}">
+        Претстојни прегледи
+    </a>
+</button>
 
 <button>
     <a href="{% url 'login:logout_user' %}">
