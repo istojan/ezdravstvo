@@ -25,22 +25,18 @@ from doctor.utils import get_apps_times_for_date
 
 @login_required(login_url='login:index')  # With this, if no user is logged in, than you will be redirected to the login page
 def homepage(request, doctor_id):
-    # print("\n\n\n We are now in doctor homepage view \n\n\n")
-
-    # need to do a patient count for the specific doctor
     patient_count = 0
-
-    # patients = Patient.objects.filter(doctor__doctor)
-    # appointments = Appointment.objects.get
-    # appointments = Appointment.objects.filter(doctor__doctor_id=doctor_id).filter(date < datetime.date.today())
-
     context = {
         'patient_count': patient_count,
         'username': request.user.get_username(),
         'password': request.user.password,
         'doc_ID': request.user.doctor.doctor_id
     }
-    return render(request, 'doctor/homepage_doctor.html', context)
+
+    if request.user.doctor.is_general_practitioner:
+        return render(request, 'doctor/homepage_doctor_gp.html', context)
+
+    return render(request, 'doctor/homepage_doctor_not_gp.html', context)
 
 
 @login_required(login_url='login:index')  # With this, if no user is logged in, than you will be redirected to the login page
@@ -91,10 +87,6 @@ class MakeAppointmentView(View):
 
     def get(self, request, doctor_id):
         # doctor_id can be removed from the url here
-
-        # context = {
-        #     'doctor_id': request.user.doctor.doctor_id
-        # }
         form = self.form_class(doctor_id = request.user.doctor.doctor_id)
 
         return render(request, self.template_name, {'form': form})
