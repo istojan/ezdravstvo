@@ -119,7 +119,18 @@ class PatientsPreviewView(View):
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user__pk=request.user.id)
         if not doctor.is_general_practitioner:
-            raise Http404("Не сте матичен доктор!") # TODO Drug view za nematichni doktori
+            apps = Appointment.objects.filter(doctor__user__id=request.user.id).exclude(report=None)
+            patients = set()
+            for app in apps:
+                patients.add(app.patient)
+                
+            context = {
+                'doctor': doctor,
+                'doctors_patients': patients
+            }
+            return render(request, 'doctor/specialist_patient_preview.html', context)
+            # raise Http404("Не сте матичен доктор!") # TODO Drug view za nematichni doktori
+
         doctors_patients = doctor.patient_set.all()
         patients_without_gp = Patient.objects.filter(general_practitioner=None)
         context = {
@@ -138,7 +149,8 @@ class OldAppointmentsView(View):
 
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user__pk=request.user.id)
-        appointments = doctor.appointment_set.filter(date__lt=datetime.date.today())
+        # appointments = doctor.appointment_set.filter(date__lt=datetime.date.today())
+        appointments = doctor.appointment_set.exclude(report=None)
         context = {
             'doctor': doctor,
             'appointments': appointments
@@ -154,7 +166,8 @@ class UpcomingAppointmentsView(View):
 
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user__pk=request.user.id)
-        appointments = doctor.appointment_set.exclude(date__lt=datetime.date.today())
+        # appointments = doctor.appointment_set.exclude(date__lt=datetime.date.today())
+        appointments = doctor.appointment_set.filter(report=None)
         context = {
             'doctor': doctor,
             'appointments': appointments
