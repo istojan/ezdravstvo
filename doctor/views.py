@@ -252,7 +252,7 @@ def appointment_details(request, doctor_id, appointment_id):
 
 def patientDetails(request, doctor_id, patient_id):
     patient = Patient.objects.get(user__id=patient_id)
-    doctors = Appointment.objects.filter(patient__user__id=patient_id)     # list of all doctors that the patinet had a appointment with
+    appointments = Appointment.objects.filter(patient__user__id=patient_id)     # list of all doctors that the patinet had a appointment with
 
     past_appointments = Appointment.objects.filter(patient__user__id=patient_id).exclude(report=None)
     future_appointments = Appointment.objects.filter(patient__user__id=patient_id).filter(report=None)
@@ -266,8 +266,8 @@ def patientDetails(request, doctor_id, patient_id):
     if patient.general_practitioner is None or patient.general_practitioner.user.id == int(doctor_id):
         return render(request, 'doctor/doctor_patient_details.html', context)
     else:
-        for doctor in doctors:
-            if doctor.user.id == int(doctor_id):
+        for app in appointments:
+            if app.doctor.user.id == int(doctor_id):
                 return render(request, 'doctor/doctor_patient_details.html', context)
 
     return Http404("No patient like that")
