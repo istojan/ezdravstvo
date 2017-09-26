@@ -9,7 +9,6 @@
 <script>
     $(document).ready(function () {
         $('.doctor_is_gp').on('click', function () {
-            console.log("My patient " + $(this).attr('id'));
             $.ajax({
                 url: '{% url 'doctor:remove_self_as_gp' %}',
                 data: {
@@ -22,7 +21,6 @@
             });
         });
         $('.no_gp').on('click', function () {
-            console.log("No one's patient " + $(this).attr('id'));
             $.ajax({
                 url: '{% url 'doctor:add_self_as_gp' %}',
                 data: {
