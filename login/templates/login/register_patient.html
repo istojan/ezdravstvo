@@ -13,7 +13,7 @@
         var doctor_ddl = $('#id_general_practitioner');
         console.log(selected);
         $.ajax({
-            url: '/ajax/get_gps_for_hospital/',
+            url: '{% url 'login:get_gps_for_hospital' %}',
             data: {
                 'hospital_id': selected
             },

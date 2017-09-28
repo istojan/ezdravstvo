@@ -197,51 +197,6 @@ class AddReportView(View):
             return Http404("Не постои прегледот!")
 
 
-def remove_self_as_gp(request):
-    patient_id = request.GET.get('patient_id', "")
-    response = "Failure"
-    if patient_id != "":
-        try:
-            patient = Patient.objects.get(pk=patient_id)
-            if patient.general_practitioner_id == request.user.doctor.id:
-                patient.general_practitioner = None
-                patient.save()
-                response = "Success"
-        except Patient.DoesNotExist:
-            response = "Failure"
-    return JsonResponse({'response': response})
-
-
-def add_self_as_gp(request):
-    patient_id = request.GET.get('patient_id', "")
-    response = "Failure"
-    if patient_id != "":
-        try:
-            patient = Patient.objects.get(pk=patient_id)
-            if patient.general_practitioner is None:
-                doctor = request.user.doctor
-                patient.general_practitioner = doctor
-                patient.save()
-                response = "Success"
-        except Patient.DoesNotExist:
-            response = "Failure"
-    return JsonResponse({'response': response})
-
-
-def remove_report_from_appointment(request):
-    appointment_id = request.GET.get('appointment_id', "")
-    response = "Failure"
-    if appointment_id != "":
-        try:
-            appointment = Appointment.objects.get(pk=appointment_id)
-            appointment.report.delete()
-            appointment.save()
-            response = "Success"
-        except Appointment.DoesNotExist:
-            response = "Failure"
-    return JsonResponse({'response': response})
-
-
 def appointment_details(request, doctor_id, appointment_id):
     appointment = Appointment.objects.get(pk=appointment_id)
     context = {
