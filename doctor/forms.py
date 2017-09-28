@@ -49,3 +49,8 @@ class AddReportForm(forms.ModelForm):
     class Meta:
         model = Report
         fields = ['diagnosis', 'therapy', 'remark']
+        labels = {
+            'diagnosis': 'Дијагноза',
+            'therapy': 'Терапија',
+            'remark': 'Забелешка'
+        }
