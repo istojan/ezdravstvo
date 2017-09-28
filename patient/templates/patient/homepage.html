@@ -3,21 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <title>Лични информации</title>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script type="text/javascript" src="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css"/>
 </head>
 <body>
-    <h3>Лични информации</h3>
-    <div>
-        Име: <b>{{ patient.name }}</b><br/>
-        Презиме: <b>{{ patient.surname }}</b><br/>
-        Матичен број: <b>{{ patient.ssn }}</b><br/>
-        Датум на раѓање: <b>{{ patient.date_of_birth }}</b><br/>
-        Адреса на живеење: <b>{{ patient.address }}</b><br/>
-        email: <b>{{ patient.user.email }}</b><br/>
-        Матичен доктор: <b>{{ patient.general_practitioner }}</b><br/>
-    </div>
+{#<h3>Лични информации</h3>#}
+{#<div>#}
+{#    Име: <b>{{ patient.name }}</b><br/>#}
+{#    Презиме: <b>{{ patient.surname }}</b><br/>#}
+{#    Матичен број: <b>{{ patient.ssn }}</b><br/>#}
+{#    Датум на раѓање: <b>{{ patient.date_of_birth }}</b><br/>#}
+{#    Адреса на живеење: <b>{{ patient.address }}</b><br/>#}
+{#    email: <b>{{ patient.user.email }}</b><br/>#}
+{#    Матичен доктор: <b>{{ patient.general_practitioner }}</b><br/>#}
+{#</div>#}
+{##}
+{#<a href="{% url 'patient:old_appointments' patient.user.id %}">Стари термини</a> <br/>#}
+{#<a href="{% url 'patient:upcoming_appointments' patient.user.id %}">Закажани термини</a> <br/>#}
+{#<a href="{% url 'login:logout_user' %}">Одјави се</a><br/>#}
 
-    <a href="{% url 'patient:old_appointments' patient.user.id %}">Стари термини</a> <br/>
-    <a href="{% url 'patient:upcoming_appointments' patient.user.id %}">Закажани термини</a> <br/>
-    <a href="{% url 'login:logout_user' %}">Одјави се</a><br/>
+<div id="tabs" style="width: 100%;"></div>
+<div id="selected-tab" style="padding: 10px 0">
+    {#    <div>#}
+    {#        Име: <b>{{ patient.name }}</b><br/>#}
+    {#        Презиме: <b>{{ patient.surname }}</b><br/>#}
+    {#        Матичен број: <b>{{ patient.ssn }}</b><br/>#}
+    {#        Датум на раѓање: <b>{{ patient.date_of_birth }}</b><br/>#}
+    {#        Адреса на живеење: <b>{{ patient.address }}</b><br/>#}
+    {#        email: <b>{{ patient.user.email }}</b><br/>#}
+    {#        Матичен доктор: <b>{{ patient.general_practitioner }}</b><br/>#}
+    {#        <a href="{% url 'login:logout_user' %}">Одјави се</a>#}
+    {#    </div>#}
+</div>
+<script type="text/javascript">
+
+    function show_personal_info() {
+        var html = "<div>\n" +
+            "    Име: <b>{{ patient.name }}</b><br/>\n" +
+            "    Презиме: <b>{{ patient.surname }}</b><br/>\n" +
+            "    Матичен број: <b>{{ patient.ssn }}</b><br/>\n" +
+            "    Датум на раѓање: <b>{{ patient.date_of_birth }}</b><br/>\n" +
+            "    Адреса на живеење: <b>{{ patient.address }}</b><br/>\n" +
+            "    email: <b>{{ patient.user.email }}</b><br/>\n" +
+            "    Матичен доктор: <b>{{ patient.general_practitioner }}</b><br/>\n" +
+            "    <a href=\"{% url 'login:logout_user' %}\">Одјави се</a>" +
+            "    </div>";
+        $('#selected-tab').html(html);
+    }
+
+    function show_old_appointments() {
+        var html = "{% if old_appointments.count == 0 %}\n"+
+            "    <div>\n"+
+            "        <i>Историјата на термини е празна.</i>\n"+
+            "    </div>\n"+
+            "{% else %}\n"+
+            "    <ul>\n"+
+            "        {% for appointment in old_appointments %}\n"+
+                "            <li>\n"+
+                "                <div style=\"border: solid; color: mediumaquamarine;\">\n"+
+                "                    Број на термин: <b>{{ appointment.appointment_number }}</b><br/>\n"+
+                "                    Доктор: <b>{{ appointment.doctor }}</b><br/>\n"+
+                "                    Датум: <b>{{ appointment.date }}</b><br/>\n"+
+                "                    Време: <b>{{ appointment.time }}</b><br/>\n"+
+                "                    <a href=\"{% url 'patient:appointment_details' patient_id=appointment.patient.user.id appointment_id=appointment.id %}\">Извештај</a>\n"
+                +
+                "                </div>\n"+
+                "            </li>\n"+
+                "        {% endfor %}\n"+
+            "    </ul>\n"+
+            "{% endif %}";
+        $('#selected-tab').html(html);
+    }
+
+    function show_upcoming_appointments() {
+        var html = "{% if upcoming_appointments.count == 0 %}\n"+
+            "    <div>\n"+
+            "        <i>Немате закажани термини.</i>\n"+
+            "    </div>\n"+
+            "{% else %}\n"+
+            "    <ul>\n"+
+            "        {% for appointment in upcoming_appointments %}\n"+
+                "            <li>\n"+
+                "                <div style=\"border: solid; color: mediumaquamarine;\">\n"+
+                "                    Број на термин: <b>{{ appointment.appointment_number }}</b><br/>\n"+
+                "                    Доктор: <b>{{ appointment.doctor }}</b><br/>\n"+
+                "                    Датум: <b>{{ appointment.date }}</b><br/>\n"+
+                "                    Време: <b>{{ appointment.time }}</b><br/>\n"+
+                "                    <a href=\"{% url 'patient:appointment_details' patient_id=appointment.patient.user.id appointment_id=appointment.id %}\">Извештај</a>\n"
+                +
+                "                </div>\n"+
+                "            </li>\n"+
+                "        {% endfor %}\n"+
+            "    </ul>\n"+
+            "{% endif %}";
+        $('#selected-tab').html(html);
+    }
+
+    function show_personal_info_ajax() {
+        $.ajax({
+            url: '{% url 'patient:get_patient_personal_info' %}',
+            data: {
+                'patient_id': '{{ patient.id }}'
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.hasOwnProperty('error')) {
+                    var html = response['error']
+                    $('#selected-tab').html(html);
+                } else {
+                    var html = "<div>\n" +
+                        "    Име: <b>" + response['name'] + "</b><br/>\n" +
+                        "    Презиме: <b>" + response['surname'] + "</b><br/>\n" +
+                        "    Матичен број: <b>" + response['ssn'] + "</b><br/>\n" +
+                        "    Датум на раѓање: <b>" + response['date_of_birth'] + "</b><br/>\n" +
+                        "    Адреса на живеење: <b>" + response['address'] + "</b><br/>\n" +
+                        "    email: <b>" + response['email'] + "</b><br/>\n" +
+                        "    Матичен доктор: <b>" + response['gp'] + "</b><br/>\n" +
+                        "    <a href=\"{% url 'login:logout_user' %}\">Одјави се</a>" +
+                        "    </div>";
+                    $('#selected-tab').html(html);
+                }
+            }
+        })
+    }
+
+    function show_old_appointments_ajax() {
+        $.ajax({
+            url: '{% url 'patient:get_old_appointments' %}',
+            data: {
+                'patient_id': '{{ patient.id }}'
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.hasOwnProperty('error')) {
+                    var html = response['error'];
+                    $('#selected-tab').html(html);
+                } else {
+                    if (response.length === 0) {
+                        var html =
+                            "<div>\n" +
+                            "    <i>Историјата на термини е празна.</i>\n" +
+                            "</div>\n";
+                        $('#selected-tab').html(html);
+                        return;
+                    }
+                    var html = "<ul>";
+                    for (var i = 0; i < response.length; ++i) {
+                        var app = response[i];
+                        html +=
+                            "<li>\n" +
+                            "                <div style=\"border: solid; color: mediumaquamarine;\">\n" +
+                            "                    Број на термин: <b>" + app['number'] + "</b><br/>\n" +
+                            "                    Доктор: <b>" + app['doctor'] + "</b><br/>\n" +
+                            "                    Датум: <b>" + app['date'] + "</b><br/>\n" +
+                            "                    Време: <b>" + app['time'] + "</b><br/>\n" +
+{#                            "                    <a href=\"{% url 'patient:appointment_details' patient_id=patient.user.id appointment_id=appointment.id %}\">Извештај</a>\n" +#}
+                            "                </div>\n" +
+                            "            </li>"
+                    }
+                    html += "</ul>";
+                    $('#selected-tab').html(html);
+                }
+            }
+        })
+    }
+
+    function show_upcoming_appointments_ajax() {
+        $.ajax({
+            url: '{% url 'patient:get_upcoming_appointments' %}',
+            data: {
+                'patient_id': '{{ patient.id }}'
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.hasOwnProperty('error')) {
+                    var html = response['error'];
+                    $('#selected-tab').html(html);
+                } else {
+                    if (response.length === 0) {
+                        var html =
+                            "<div>\n" +
+                            "    <i>Немате закажани термини.</i>\n" +
+                            "</div>\n";
+                        $('#selected-tab').html(html);
+                        return;
+                    }
+                    var html = "<ul>";
+                    for (var i = 0; i < response.length; ++i) {
+                        var app = response[i];
+                        html +=
+                            "<li>\n" +
+                            "                <div style=\"border: solid; color: mediumaquamarine;\">\n" +
+                            "                    Број на термин: <b>" + app['number'] + "</b><br/>\n" +
+                            "                    Доктор: <b>" + app['doctor'] + "</b><br/>\n" +
+                            "                    Датум: <b>" + app['date'] + "</b><br/>\n" +
+                            "                    Време: <b>" + app['time'] + "</b><br/>\n" +
+{#                            "                    <a href=\"{% url 'patient:appointment_details' patient_id=appointment.patient.user.id appointment_id=appointment.id %}\">Извештај</a>\n" +#}
+                            "                </div>\n" +
+                            "            </li>"
+                    }
+                    html += "</ul>";
+                    $('#selected-tab').html(html);
+                }
+            }
+        })
+    }
+
+    $(function () {
+        $('#tabs').w2tabs({
+            name: 'tabs',
+            active: 'personal_info',
+            tabs: [
+                {id: 'personal_info', text: "Лични информации"},
+                {id: 'old_appointments', text: "Изминати термини/прегледи"},
+                {id: 'upcoming_appointments', text: "Закажани термини"}
+            ],
+            onClick: function (event) {
+                var tab_id = event.target;
+                switch (tab_id) {
+                    case 'personal_info':
+                        show_personal_info();
+                        break;
+                    case 'old_appointments':
+                        show_old_appointments();
+                        break;
+                    case 'upcoming_appointments':
+                        show_upcoming_appointments();
+                        break;
+                }
+            }
+        });
+    });
+
+    $(document).ready(function () {
+                show_personal_info();
+{#        show_personal_info_ajax();#}
+    });
+</script>
 </body>
 </html>

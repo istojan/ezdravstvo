@@ -1,25 +1,28 @@
-import datetime
-
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.shortcuts import render, get_object_or_404
 from django.http import Http404
+from django.shortcuts import render
 
 # Create your views here.
-from login.models import Patient, Doctor, Report
+from login.models import Patient, Report, Appointment
 
 
 @login_required(login_url='login:index')
 def homepage(request, patient_id):
     # TODO Check patient_id == user_id
     patient = Patient.objects.get(user__pk=request.user.id)
-    return render(request, 'patient/homepage.html', {'patient': patient})
+    old_appointments1 = patient.appointment_set.exclude(report=None)
+    upcoming_appointments1 = patient.appointment_set.filter(report=None)
+    return render(request, 'patient/homepage.html', {
+        'patient': patient,
+        'old_appointments': old_appointments1,
+        'upcoming_appointments': upcoming_appointments1
+    })
 
 
 @login_required(login_url='login:index')
 def old_appointments(request, patient_id):
     patient = Patient.objects.get(user__pk=request.user.id)
-    appointments = patient.appointment_set.filter(date__lt=datetime.date.today())
+    appointments = patient.appointment_set.exclude(report=None)
     return render(request, 'patient/old_appointments.html', {'appointments': appointments,
                                                              'patient': patient})
 
@@ -27,17 +30,17 @@ def old_appointments(request, patient_id):
 @login_required(login_url='login:index')
 def upcoming_appointments(request, patient_id):
     patient = Patient.objects.get(user__pk=request.user.id)
-    appointments = patient.appointment_set.exclude(date__lt=datetime.date.today())
+    appointments = patient.appointment_set.filter(report=None)
     return render(request, 'patient/upcoming_appointments.html', {'patient': patient,
                                                                   'appointments': appointments})
 
 
 @login_required(login_url='login:index')
-def appointment_details(request, report_id):
+def appointment_details(request, patient_id, appointment_id):
     try:
-        report = Report.objects.get(pk=report_id)
-        if report.appointment.patient.user_id == request.user.id:
-            return render(request, 'patient/appointment_details.html', {'report': report})
+        appointment = Appointment.objects.get(pk=appointment_id)
+        if appointment.patient.user.id == request.user.id:
+            return render(request, 'patient/appointment_details.html', {'appointment': appointment})
         else:
             raise Http404("Извештајот не постои")
     except Report.DoesNotExist:

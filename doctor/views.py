@@ -1,22 +1,13 @@
-import datetime
-
-from django.contrib.auth import (
-    authenticate,
-    get_user_model,
-    login,
-    logout,
-)
-
-from django.shortcuts import render, redirect, reverse
-from django.http import HttpResponseRedirect, Http404
+from django.contrib.auth.decorators import login_required
+from django.http import Http404
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
 # from .forms import UserLoginForm
 from django.views.generic import View
-from django.contrib.auth.decorators import login_required
 
-from login.models import Patient, Doctor, Appointment
 from doctor.forms import AppointmentForm, AddReportForm
-from django.http import JsonResponse
 from doctor.utils import get_apps_times_for_date
+from login.models import Patient, Doctor, Appointment
 
 
 # from .forms import UserForm, PatientRegistrationForm, DoctorRegistrationForm
@@ -26,17 +17,45 @@ from doctor.utils import get_apps_times_for_date
 @login_required(login_url='login:index')  # With this, if no user is logged in, than you will be redirected to the login page
 def homepage(request, doctor_id):
     patient_count = 0
-    context = {
-        'patient_count': patient_count,
-        'username': request.user.get_username(),
-        'password': request.user.password,
-        'doc_ID': request.user.doctor.doctor_id
-    }
+    # context = {
+    #     'patient_count': patient_count,
+    #     'username': request.user.get_username(),
+    #     'password': request.user.password,
+    #     'doc_ID': request.user.doctor.doctor_id
+    # }
 
-    if request.user.doctor.is_general_practitioner:
+    # TODO =============================================================================================================
+    doctor = Doctor.objects.get(user__pk=request.user.id)
+    if not doctor.is_general_practitioner:
+        apps = Appointment.objects.filter(doctor__user__id=request.user.id).exclude(report=None)
+        old_appointments = doctor.appointment_set.exclude(report=None)
+        upcoming_appointments = doctor.appointment_set.filter(report=None)
+        patients = set()
+        for app in apps:
+            patients.add(app.patient)
+
+        context = {
+            'doctor': doctor,
+            'doctors_patients': patients,
+            'old_appointments': old_appointments,
+            'upcoming_appointments': upcoming_appointments
+        }
+        return render(request, 'doctor/homepage_doctor_not_gp.html', context)
+    else:
+
+        doctors_patients = doctor.patient_set.all()
+        patients_without_gp = Patient.objects.filter(general_practitioner=None)
+        context = {
+            'doctor': doctor,
+            'doctors_patients': doctors_patients,
+            'patients_without_gp': patients_without_gp
+        }
         return render(request, 'doctor/homepage_doctor_gp.html', context)
-
-    return render(request, 'doctor/homepage_doctor_not_gp.html', context)
+    # TODO =============================================================================================================
+    # if request.user.doctor.is_general_practitioner:
+    #     return render(request, 'doctor/homepage_doctor_gp.html', context)
+    #
+    # return render(request, 'doctor/homepage_doctor_not_gp.html', context)
 
 
 @login_required(login_url='login:index')  # With this, if no user is logged in, than you will be redirected to the login page
@@ -129,7 +148,6 @@ class PatientsPreviewView(View):
                 'doctors_patients': patients
             }
             return render(request, 'doctor/specialist_patient_preview.html', context)
-            # raise Http404("Не сте матичен доктор!") # TODO Drug view za nematichni doktori
 
         doctors_patients = doctor.patient_set.all()
         patients_without_gp = Patient.objects.filter(general_practitioner=None)
@@ -144,6 +162,7 @@ class PatientsPreviewView(View):
         pass
 
 
+# TODO Check query for general practitioners
 class OldAppointmentsView(View):
     template_name = 'doctor/old_appointments.html'
 
@@ -197,51 +216,6 @@ class AddReportView(View):
             return Http404("Не постои прегледот!")
 
 
-def remove_self_as_gp(request):
-    patient_id = request.GET.get('patient_id', "")
-    response = "Failure"
-    if patient_id != "":
-        try:
-            patient = Patient.objects.get(pk=patient_id)
-            if patient.general_practitioner_id == request.user.doctor.id:
-                patient.general_practitioner = None
-                patient.save()
-                response = "Success"
-        except Patient.DoesNotExist:
-            response = "Failure"
-    return JsonResponse({'response': response})
-
-
-def add_self_as_gp(request):
-    patient_id = request.GET.get('patient_id', "")
-    response = "Failure"
-    if patient_id != "":
-        try:
-            patient = Patient.objects.get(pk=patient_id)
-            if patient.general_practitioner is None:
-                doctor = request.user.doctor
-                patient.general_practitioner = doctor
-                patient.save()
-                response = "Success"
-        except Patient.DoesNotExist:
-            response = "Failure"
-    return JsonResponse({'response': response})
-
-
-def remove_report_from_appointment(request):
-    appointment_id = request.GET.get('appointment_id', "")
-    response = "Failure"
-    if appointment_id != "":
-        try:
-            appointment = Appointment.objects.get(pk=appointment_id)
-            appointment.report.delete()
-            appointment.save()
-            response = "Success"
-        except Appointment.DoesNotExist:
-            response = "Failure"
-    return JsonResponse({'response': response})
-
-
 def appointment_details(request, doctor_id, appointment_id):
     appointment = Appointment.objects.get(pk=appointment_id)
     context = {
@@ -252,7 +226,7 @@ def appointment_details(request, doctor_id, appointment_id):
 
 def patientDetails(request, doctor_id, patient_id):
     patient = Patient.objects.get(user__id=patient_id)
-    doctors = Appointment.objects.filter(patient__user__id=patient_id)     # list of all doctors that the patinet had a appointment with
+    appointments = Appointment.objects.filter(patient__user__id=patient_id)     # list of all doctors that the patinet had a appointment with
 
     past_appointments = Appointment.objects.filter(patient__user__id=patient_id).exclude(report=None)
     future_appointments = Appointment.objects.filter(patient__user__id=patient_id).filter(report=None)
@@ -266,8 +240,8 @@ def patientDetails(request, doctor_id, patient_id):
     if patient.general_practitioner is None or patient.general_practitioner.user.id == int(doctor_id):
         return render(request, 'doctor/doctor_patient_details.html', context)
     else:
-        for doctor in doctors:
-            if doctor.user.id == int(doctor_id):
+        for app in appointments:
+            if app.doctor.user.id == int(doctor_id):
                 return render(request, 'doctor/doctor_patient_details.html', context)
 
     return Http404("No patient like that")

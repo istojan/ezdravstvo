@@ -19,11 +19,7 @@
                     Доктор: <b>{{ appointment.doctor }}</b><br/>
                     Датум: <b>{{ appointment.date }}</b><br/>
                     Време: <b>{{ appointment.time }}</b><br/>
-                    {% if appointment.report.pk %}
-                        <a href="{% url 'patient:appointment_details' appointment.report.pk %}">Извештај</a>
-                    {% else %}
-                        Извештај<span style="color: grey"><i>(Нема извештај)</i></span>
-                    {% endif %}
+                    <a href="{% url 'patient:appointment_details' patient_id=appointment.patient.user.id appointment_id=appointment.id %}">Извештај</a>
                 </div>
             </li>
         {% endfor %}

@@ -26,29 +26,37 @@ class ChoiceFieldNoValidation(forms.ChoiceField):
 
 
 class PatientRegistrationForm(UserCreationForm):
-    name = forms.CharField(max_length=30)
-    surname = forms.CharField(max_length=30)
-    ssn = forms.CharField(min_length=13, max_length=13)
-    date_of_birth = forms.DateField(widget=SelectDateWidget(years=range(1900, 2017)))
-    address = forms.CharField(max_length=30)
-    hospital = forms.ModelChoiceField(required=False,
+    name = forms.CharField(label="Име", max_length=30)
+    surname = forms.CharField(label="Презиме", max_length=30)
+    ssn = forms.CharField(label="Матичен број", min_length=13, max_length=13)
+    date_of_birth = forms.DateField(label="Датум на раѓање", widget=SelectDateWidget(years=range(1900, 2017)))
+    address = forms.CharField(label="", max_length=30)
+    hospital = forms.ModelChoiceField(label="Здравствена установа",
+                                      required=False,
                                       queryset=Hospital.objects.all(),
                                       widget=forms.Select(attrs={'onchange': 'get_doctors()'}))
-    general_practitioner = ChoiceFieldNoValidation(required=False)
+    general_practitioner = ChoiceFieldNoValidation(label="Матичен доктор",
+                                                   required=False)
 
     class Meta:
         model = User
         fields = ('name', 'surname', 'ssn', 'date_of_birth', 'address', 'email', 'password1', 'password2',
                   'hospital', 'general_practitioner')
+        labels = {
+            'email': 'Email адреса'
+        }
 
 
 class DoctorRegistrationForm(UserCreationForm):
-    name = forms.CharField(max_length=30)
-    surname = forms.CharField(max_length=30)
-    doctor_id = forms.CharField(max_length=6)
-    hospital = forms.ModelChoiceField(queryset=Hospital.objects.all())
-    is_general_practitioner = forms.BooleanField(required=False)
+    name = forms.CharField(label="Име", max_length=30)
+    surname = forms.CharField(label="Презиме", max_length=30)
+    doctor_id = forms.CharField(label="Докторска идентификација", max_length=6)
+    hospital = forms.ModelChoiceField(label="Здравствена установа", queryset=Hospital.objects.all())
+    is_general_practitioner = forms.BooleanField(label="Матичен доктор", required=False)
 
     class Meta:
         model = User
         fields = ('name', 'surname', 'email', 'doctor_id', 'hospital', 'is_general_practitioner')
+        labels = {
+            'email': 'Email адреса'
+        }

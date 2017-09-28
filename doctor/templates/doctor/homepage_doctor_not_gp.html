@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Специјалист</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script type="text/javascript" src="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css"/>
 </head>
 <body>
 <h1>Bravo. It worked. This is the login page of a specialist doctor!!!</h1>
@@ -59,5 +62,144 @@
         Logout
     </a>
 </button>
+<br/>-----------------------------------------------------------------------------------------------------------------------
+<div id="tabs" style="width: 100%;"></div>
+<div id="selected-tab" style="padding: 10px 0px">tab1</div>
+<div>
+    <button>
+        <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
+            Make appointment
+        </a>
+    </button>
+</div>
+<button>
+    <a href="{% url 'login:logout_user' %}">
+        Logout
+    </a>
+</button>
+
+<script type="text/javascript">
+
+    function show_personal_info() {
+        var html = "" +
+            "<div>\n" +
+            "    <h4>Лични информации</h4>\n" +
+            "    Име: {{ doctor.name }} <br>\n" +
+            "    Презиме: {{ doctor.surname }} <br>\n" +
+            "    Докторска идентификација: {{ doctor.doctor_id }} <br>\n" +
+            "    Everything else...\n" +
+            "</div>\n" +
+            "\n" +
+            "<div>\n" +
+            "    <h4>Специјализација</h4>\n" +
+            "\n" +
+            "    Специјалист (да наведеме некако специјализации...)\n" +
+            "</div>";
+        $('#selected-tab').html(html);
+    }
+
+    function show_patients_overview() {
+        var html = "" +
+            "<h3>Пациенти на {{ doctor.name }} {{ doctor.surname }}</h3>\n" +
+            "<h2>Прегледани пациенти:</h2>\n" +
+            "<ul>\n" +
+            "    {% for patient in doctors_patients %}\n"+
+                "        <li>\n"+
+                "            <div>\n"+
+                "                <a href=\"{% url 'doctor:patientDetails' request.user.id patient.user.id %}\"> {{ patient }} </a>\n"
+                +
+                "            </div>\n"+
+                "        </li>\n"+
+                "    {% endfor %}\n" +
+            "</ul>";
+        $('#selected-tab').html(html);
+    }
+
+    function show_old_appointments() {
+        var html = "" +
+            "<h3>Термини на {{ doctor.name }} {{ doctor.surname }}</h3>\n" +
+            "{% if old_appointments.count == 0 %}\n"+
+                "    <div>\n"+
+                "        <i>Историјата на термини е празна.</i>\n"+
+                "    </div>\n"+
+                "{% else %}\n"+
+                "    <ul>\n"+
+                "        {% for appointment in old_appointments %}\n"+
+                    "            <li>\n"+
+                    "                <div style=\"border: solid; color: mediumaquamarine;\">\n"+
+                    "                    Број на термин: <b>{{ appointment.appointment_number }}</b><br/>\n"+
+                    "                    Пациент: <b>{{ appointment.patient }}</b><br/>\n"+
+                    "                    Датум: <b>{{ appointment.date }}</b><br/>\n"+
+                    "                    Време: <b>{{ appointment.time }}</b><br/>\n"+
+                    "                    <a href=\"{% url 'doctor:appointment_details' doctor_id=appointment.doctor.user.id appointment_id=appointment.id %}\">Извештај</a>\n"
+                    +
+                    "                </div>\n"+
+                    "            </li>\n"+
+                    "        {% endfor %}\n"+
+                "    </ul>\n"+
+                "{% endif %}";
+        $('#selected-tab').html(html);
+    }
+
+    function show_upcoming_appointments() {
+        var html = "" +
+            "<h3>Закажани термини на {{ doctor.name }} {{ doctor.surname }}</h3>\n" +
+            "{% if upcoming_appointments.count == 0 %}\n"+
+                "    <div>\n"+
+                "        <i>Немате закажани термини</i>\n"+
+                "    </div>\n"+
+                "{% else %}\n"+
+                "    <ul>\n"+
+                "        {% for appointment in upcoming_appointments %}\n"+
+                    "            <li>\n"+
+                    "                <div style=\"border: solid; color: mediumaquamarine;\">\n"+
+                    "                    Број на термин: <b>{{ appointment.appointment_number }}</b><br/>\n"+
+                    "                    Пациент: <b>{{ appointment.patient }}</b><br/>\n"+
+                    "                    Датум: <b>{{ appointment.date }}</b><br/>\n"+
+                    "                    Време: <b>{{ appointment.time }}</b><br/>\n"+
+                    "                    <a href=\"{% url 'doctor:appointment_details' doctor_id=appointment.doctor.user.id appointment_id=appointment.id %}\">Извештај</a>\n"
+                    +
+                    "                </div>\n"+
+                    "            </li>\n"+
+                    "        {% endfor %}\n"+
+                "    </ul>\n"+
+                "{% endif %}";
+        $('#selected-tab').html(html);
+    }
+
+    $(function () {
+        $('#tabs').w2tabs({
+            name: 'tabs',
+            active: 'personal_info',
+            tabs: [
+                {id: 'personal_info', text: 'Лични информации'},
+                {id: 'patients_overview', text: 'Преглед на пациенти'},
+                {id: 'old_appointments', text: 'Изминати термини/прегледи'},
+                {id: 'upcoming_appointments', text: 'Закажани термини/прегледи'}
+            ],
+            onClick: function (event) {
+                var tab_id = event.target;
+                switch (tab_id) {
+                    case 'personal_info':
+                        show_personal_info();
+                        break;
+                    case 'patients_overview':
+                        show_patients_overview();
+                        break;
+                    case 'old_appointments':
+                        show_old_appointments();
+                        break;
+                    case 'upcoming_appointments':
+                        show_upcoming_appointments();
+                        break;
+                }
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        show_personal_info();
+    });
+</script>
 </body>
 </html>

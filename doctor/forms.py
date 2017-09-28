@@ -1,12 +1,16 @@
 from django import forms
 
-from login.models import Doctor, Patient, Appointment, Report
+from login.models import Doctor, Patient, Appointment, Report, Hospital
 from doctor.utils import get_list_dates
 from login.forms import ChoiceFieldNoValidation
 
 
 class AppointmentForm(forms.ModelForm):
-    doctor = forms.ModelChoiceField(label="Доктор", required=True, queryset=Doctor.objects.filter(is_general_practitioner=False))
+    hospital = forms.ModelChoiceField(label="Здравствена установа", required=False,
+                                      queryset=Hospital.objects.all(),
+                                      widget=forms.Select(attrs={'onchange': 'get_doctors_for_hospital()'}))
+    doctor = forms.ModelChoiceField(label="Доктор", required=True,
+                                    queryset=Doctor.objects.filter(is_general_practitioner=False))
     date2 = ChoiceFieldNoValidation()
     time2 = ChoiceFieldNoValidation(label='Време')
 
@@ -37,7 +41,7 @@ class AppointmentForm(forms.ModelForm):
     class Meta:
         model = Appointment
         fields = [
-            'doctor', 'patient','date2', 'time2'
+            'hospital', 'doctor', 'patient', 'date2', 'time2'
         ]
 
 
@@ -45,3 +49,8 @@ class AddReportForm(forms.ModelForm):
     class Meta:
         model = Report
         fields = ['diagnosis', 'therapy', 'remark']
+        labels = {
+            'diagnosis': 'Дијагноза',
+            'therapy': 'Терапија',
+            'remark': 'Забелешка'
+        }

@@ -8,53 +8,82 @@
 
 </head>
 <body>
-    <form id= "app_form_id" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Make Appointment</button>
-    </form>
+<form id="app_form_id" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Make Appointment</button>
+</form>
 
-    <script>
+<script>
 
-        function make_change(){
-            console.log("YEAH, this function is called. I am gonna retrieve available times for apps for the chosen date.")
-
-            $('#id_time2').empty();
-            var date_selected = $('#id_date2').find(":selected").text();
-            var date_parsed = date_selected.split('-');
-            var year = date_parsed[0]
-            var month = date_parsed[1]
-            var day = date_parsed[2]
-
-            var doctor_selected = $('#id_doctor').val(); {# returns primary key of doctor  #}
-
-            $.ajax({
-                url: '/ajax/get_times_available/',
-                data: {
-                    'year': year,
-                    'month': month,
-                    'day': day,
-                    'doctor': doctor_selected
-                },
-                dataType: 'json',
-                success: function (data) {
-                    console.log("Ajax function finished successfully")
-                    console.log(data.times)
-
-                    data.times.forEach(function (element) {
-{#                       console.log(element[1]);#}
-                       $('#id_time2').append($('<option>', {
-                            value: element[0],
-                            text: element[1]
-                       }));
-                    });
-                }
-              });
-
-            console.log("Finished adding values")
+    function get_doctors_for_hospital() {
+        var hospital_ddl = $('#id_hospital');
+        var selected = hospital_ddl.find(":selected").val();
+        if (selected == "") {
+            selected = "all";
         }
+        var doctor_ddl = $('#id_doctor');
+        console.log(selected);
+        $.ajax({
+            url: '{% url 'doctor:get_doctors_for_hospital' %}',
+            data: {
+                'hospital_id': selected
+            },
+            dataType: 'json',
+            success: function (data) {
+                var html_text = "";
+                for (var i = 0; i < data.length; i++) {
+                    var doc = data[i];
+                    var id = doc['id'];
+                    var name = doc['name'];
+                    var option = "<option value=\"" + id + "\">" + name + "</option>" + "<br/>";
+                    html_text += option;
+                }
+                doctor_ddl.html(html_text)
+            }
+        })
+    }
+
+    function make_change() {
+        console.log("YEAH, this function is called. I am gonna retrieve available times for apps for the chosen date.")
+
+        $('#id_time2').empty();
+        var date_selected = $('#id_date2').find(":selected").text();
+        var date_parsed = date_selected.split('-');
+        var year = date_parsed[0]
+        var month = date_parsed[1]
+        var day = date_parsed[2]
+
+        var doctor_selected = $('#id_doctor').val();
+        {# returns primary key of doctor  #}
+
+        $.ajax({
+            url: '/ajax/get_times_available/',
+            data: {
+                'year': year,
+                'month': month,
+                'day': day,
+                'doctor': doctor_selected
+            },
+            dataType: 'json',
+            success: function (data) {
+                console.log("Ajax function finished successfully")
+                console.log(data.times)
+
+                data.times.forEach(function (element) {
+                    {#                       console.log(element[1]);#}
+                    $('#id_time2').append($('<option>', {
+                        value: element[0],
+                        text: element[1]
+                    }));
+                });
+            }
+        });
+
+        console.log("Finished adding values")
+    }
 
 
-    </script>
+</script>
 </body>
 </html>
