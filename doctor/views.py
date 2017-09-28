@@ -1,22 +1,13 @@
-import datetime
-
-from django.contrib.auth import (
-    authenticate,
-    get_user_model,
-    login,
-    logout,
-)
-
-from django.shortcuts import render, redirect, reverse
-from django.http import HttpResponseRedirect, Http404
+from django.contrib.auth.decorators import login_required
+from django.http import Http404
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
 # from .forms import UserLoginForm
 from django.views.generic import View
-from django.contrib.auth.decorators import login_required
 
-from login.models import Patient, Doctor, Appointment
 from doctor.forms import AppointmentForm, AddReportForm
-from django.http import JsonResponse
 from doctor.utils import get_apps_times_for_date
+from login.models import Patient, Doctor, Appointment
 
 
 # from .forms import UserForm, PatientRegistrationForm, DoctorRegistrationForm
@@ -26,17 +17,41 @@ from doctor.utils import get_apps_times_for_date
 @login_required(login_url='login:index')  # With this, if no user is logged in, than you will be redirected to the login page
 def homepage(request, doctor_id):
     patient_count = 0
-    context = {
-        'patient_count': patient_count,
-        'username': request.user.get_username(),
-        'password': request.user.password,
-        'doc_ID': request.user.doctor.doctor_id
-    }
+    # context = {
+    #     'patient_count': patient_count,
+    #     'username': request.user.get_username(),
+    #     'password': request.user.password,
+    #     'doc_ID': request.user.doctor.doctor_id
+    # }
 
-    if request.user.doctor.is_general_practitioner:
+    # TODO =============================================================================================================
+    doctor = Doctor.objects.get(user__pk=request.user.id)
+    if not doctor.is_general_practitioner:
+        apps = Appointment.objects.filter(doctor__user__id=request.user.id).exclude(report=None)
+        patients = set()
+        for app in apps:
+            patients.add(app.patient)
+
+        context = {
+            'doctor': doctor,
+            'doctors_patients': patients
+        }
+        return render(request, 'doctor/homepage_doctor_not_gp.html', context)
+    else:
+
+        doctors_patients = doctor.patient_set.all()
+        patients_without_gp = Patient.objects.filter(general_practitioner=None)
+        context = {
+            'doctor': doctor,
+            'doctors_patients': doctors_patients,
+            'patients_without_gp': patients_without_gp
+        }
         return render(request, 'doctor/homepage_doctor_gp.html', context)
-
-    return render(request, 'doctor/homepage_doctor_not_gp.html', context)
+    # TODO =============================================================================================================
+    # if request.user.doctor.is_general_practitioner:
+    #     return render(request, 'doctor/homepage_doctor_gp.html', context)
+    #
+    # return render(request, 'doctor/homepage_doctor_not_gp.html', context)
 
 
 @login_required(login_url='login:index')  # With this, if no user is logged in, than you will be redirected to the login page
@@ -129,7 +144,6 @@ class PatientsPreviewView(View):
                 'doctors_patients': patients
             }
             return render(request, 'doctor/specialist_patient_preview.html', context)
-            # raise Http404("Не сте матичен доктор!") # TODO Drug view za nematichni doktori
 
         doctors_patients = doctor.patient_set.all()
         patients_without_gp = Patient.objects.filter(general_practitioner=None)
@@ -144,6 +158,7 @@ class PatientsPreviewView(View):
         pass
 
 
+# TODO Check query for general practitioners
 class OldAppointmentsView(View):
     template_name = 'doctor/old_appointments.html'
 

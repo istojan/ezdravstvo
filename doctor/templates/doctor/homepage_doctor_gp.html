@@ -2,40 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Матичен доктор</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script type="text/javascript" src="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css"/>
 </head>
 <body>
-<h1>Bravo. It worked. This is the login page of a doctor!!!</h1>
-<h2>Your user name is {{ username }}</h2>
-<h3>Your password is {{ password }}</h3>
-<h3>Your doctor ID is {{ doc_ID }}</h3>
+{#<h2>Your user name is {{ username }}</h2>#}
+{#<h3>Your password is {{ password }}</h3>#}
+{#<h3>Your doctor ID is {{ doc_ID }}</h3>#}
+{##}
+{#<div>#}
+{#    <h4>Лични информации</h4>#}
+{#    Име: {{ request.user.doctor.name }} <br>#}
+{#    Презиме: {{ request.user.doctor.surname }} <br>#}
+{#    Докторска идентификација: {{ request.user.doctor.doctor_id }} <br>#}
+{#    Everything else...#}
+{#</div>#}
+{##}
+{#<div>#}
+{#    <h4>Специјализација</h4>#}
+{##}
+{#    Матичен доктор#}
+{#</div>#}
+{##}
+{#<div>#}
+{#    <h4>Пациенти</h4>#}
+{#    Број на пациенти: {{ patient_count }}#}
+{##}
+{#</div>#}
+{##}
+{##}
+{#<button>#}
+{#    <a href="{% url 'doctor:patients_preview' doctor_id=request.user.id %}">#}
+{#        Преглед на пациенти#}
+{#    </a>#}
+{#</button>#}
+{#<div>#}
+{#    <button>#}
+{#        <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">#}
+{#            Make appointment#}
+{#        </a>#}
+{#    </button>#}
+{#</div>#}
+{#<button>#}
+{#    <a href="{% url 'doctor:old_appointments' doctor_id=request.user.id %}">#}
+{#        Стари прегледи#}
+{#    </a>#}
+{#</button>#}
+{##}
+{#<button>#}
+{#    <a href="{% url 'login:logout_user' %}">#}
+{#        Logout#}
+{#    </a>#}
+{#</button>#}
 
-<div>
-    <h4>Лични информации</h4>
-    Име: {{ request.user.doctor.name }} <br>
-    Презиме: {{ request.user.doctor.surname }} <br>
-    Докторска идентификација: {{ request.user.doctor.doctor_id }} <br>
-    Everything else...
-</div>
-
-<div>
-    <h4>Специјализација</h4>
-
-    Матичен доктор
-</div>
-
-<div>
-    <h4>Пациенти</h4>
-    Број на пациенти: {{ patient_count }}
-
-</div>
-
-
-<button>
-    <a href="{% url 'doctor:patients_preview' doctor_id=request.user.id %}">
-        Преглед на пациенти
-    </a>
-</button>
+<div id="tabs" style="width: 100%;"></div>
+<div id="selected-tab" style="padding: 10px 0px">tab1</div>
 <div>
     <button>
         <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
@@ -44,15 +67,94 @@
     </button>
 </div>
 <button>
-    <a href="{% url 'doctor:old_appointments' doctor_id=request.user.id %}">
-        Стари прегледи
-    </a>
-</button>
-
-<button>
     <a href="{% url 'login:logout_user' %}">
         Logout
     </a>
 </button>
+<script type="text/javascript">
+
+    function show_personal_info() {
+        var html = "" +
+            "\n" +
+            "<div>\n" +
+            "    <h4>Лични информации</h4>\n" +
+            "    Име: {{ request.user.doctor.name }} <br>\n" +
+            "    Презиме: {{ request.user.doctor.surname }} <br>\n" +
+            "    Докторска идентификација: {{ request.user.doctor.doctor_id }} <br>\n" +
+            "    Everything else...\n" +
+            "</div>\n" +
+            "\n" +
+            "<div>\n" +
+            "    <h4>Специјализација</h4>\n" +
+            "\n" +
+            "    Матичен доктор\n" +
+            "</div>";
+        $('#selected-tab').html(html);
+    }
+
+    function show_patients_overview() {
+        var html = "" +
+            "<h3>Пациенти на {{ doctor.name }} {{ doctor.surname }}</h3>\n" +
+            "<h2>Матични пациенти:</h2>\n" +
+            "<ul>\n" +
+            "    {% for patient in doctors_patients %}\n"+
+                "        <li>\n"+
+                "            <div>\n"+
+                "                <a href=\"{% url 'doctor:patientDetails' request.user.id patient.user.id %}\"> {{ patient }} </a>\n"
+                +
+                "            </div>\n"+
+                "        </li>\n"+
+                "    {% endfor %}\n" +
+            "</ul>\n" +
+            "<h2>Пациенти без матичен доктор:</h2>\n" +
+            "<ul>\n" +
+            "    {% for patient in patients_without_gp %}\n"+
+                "        <li>\n"+
+                "            <div>\n"+
+                "                <a href=\"{% url 'doctor:patientDetails' request.user.id patient.user.id %}\"> {{ patient }} </a>\n"
+                +
+                "            </div>\n"+
+                "        </li>\n"+
+                "    {% endfor %}\n" +
+            "</ul>";
+        $('#selected-tab').html(html);
+    }
+
+    function show_old_appointments() {
+        var html = "<b style=\"size:large;\">OVA NE E NAPRAVENO DEKA TREBA DA VIDIME KAKO</b>";
+        $('#selected-tab').html(html);
+    }
+
+    $(function () {
+        $('#tabs').w2tabs({
+            name: 'tabs',
+            active: 'personal_info',
+            tabs: [
+                {id: 'personal_info', text: 'Лични информации'},
+                {id: 'patients_overview', text: 'Преглед на пациенти'},
+                {id: 'old_appointments', text: 'Стари прегледи'}
+            ],
+            onClick: function (event) {
+                var tab_id = event.target;
+                switch (tab_id) {
+                    case 'personal_info':
+                        show_personal_info();
+                        break;
+                    case 'patients_overview':
+                        show_patients_overview();
+                        break;
+                    case 'old_appointments':
+                        show_old_appointments();
+                        break;
+                }
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        show_personal_info();
+    });
+</script>
+
 </body>
 </html>
