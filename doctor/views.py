@@ -28,13 +28,17 @@ def homepage(request, doctor_id):
     doctor = Doctor.objects.get(user__pk=request.user.id)
     if not doctor.is_general_practitioner:
         apps = Appointment.objects.filter(doctor__user__id=request.user.id).exclude(report=None)
+        old_appointments = doctor.appointment_set.exclude(report=None)
+        upcoming_appointments = doctor.appointment_set.filter(report=None)
         patients = set()
         for app in apps:
             patients.add(app.patient)
 
         context = {
             'doctor': doctor,
-            'doctors_patients': patients
+            'doctors_patients': patients,
+            'old_appointments': old_appointments,
+            'upcoming_appointments': upcoming_appointments
         }
         return render(request, 'doctor/homepage_doctor_not_gp.html', context)
     else:

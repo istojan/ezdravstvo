@@ -8,55 +8,55 @@
     <link rel="stylesheet" type="text/css" href="http://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css"/>
 </head>
 <body>
-{#<h2>Your user name is {{ username }}</h2>#}
-{#<h3>Your password is {{ password }}</h3>#}
-{#<h3>Your doctor ID is {{ doc_ID }}</h3>#}
-{##}
-{#<div>#}
-{#    <h4>Лични информации</h4>#}
-{#    Име: {{ request.user.doctor.name }} <br>#}
-{#    Презиме: {{ request.user.doctor.surname }} <br>#}
-{#    Докторска идентификација: {{ request.user.doctor.doctor_id }} <br>#}
-{#    Everything else...#}
-{#</div>#}
-{##}
-{#<div>#}
-{#    <h4>Специјализација</h4>#}
-{##}
-{#    Матичен доктор#}
-{#</div>#}
-{##}
-{#<div>#}
-{#    <h4>Пациенти</h4>#}
-{#    Број на пациенти: {{ patient_count }}#}
-{##}
-{#</div>#}
-{##}
-{##}
-{#<button>#}
-{#    <a href="{% url 'doctor:patients_preview' doctor_id=request.user.id %}">#}
-{#        Преглед на пациенти#}
-{#    </a>#}
-{#</button>#}
-{#<div>#}
-{#    <button>#}
-{#        <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">#}
-{#            Make appointment#}
-{#        </a>#}
-{#    </button>#}
-{#</div>#}
-{#<button>#}
-{#    <a href="{% url 'doctor:old_appointments' doctor_id=request.user.id %}">#}
-{#        Стари прегледи#}
-{#    </a>#}
-{#</button>#}
-{##}
-{#<button>#}
-{#    <a href="{% url 'login:logout_user' %}">#}
-{#        Logout#}
-{#    </a>#}
-{#</button>#}
+<h2>Your user name is {{ username }}</h2>
+<h3>Your password is {{ password }}</h3>
+<h3>Your doctor ID is {{ doc_ID }}</h3>
 
+<div>
+    <h4>Лични информации</h4>
+    Име: {{ request.user.doctor.name }} <br>
+    Презиме: {{ request.user.doctor.surname }} <br>
+    Докторска идентификација: {{ request.user.doctor.doctor_id }} <br>
+    Everything else...
+</div>
+
+<div>
+    <h4>Специјализација</h4>
+
+    Матичен доктор
+</div>
+
+<div>
+    <h4>Пациенти</h4>
+    Број на пациенти: {{ patient_count }}
+
+</div>
+
+
+<button>
+    <a href="{% url 'doctor:patients_preview' doctor_id=request.user.id %}">
+        Преглед на пациенти
+    </a>
+</button>
+<div>
+    <button>
+        <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
+            Make appointment
+        </a>
+    </button>
+</div>
+<button>
+    <a href="{% url 'doctor:old_appointments' doctor_id=request.user.id %}">
+        Стари прегледи
+    </a>
+</button>
+
+<button>
+    <a href="{% url 'login:logout_user' %}">
+        Logout
+    </a>
+</button>
+<br/>-------------------------------------------------------------------------------------------------------------------
 <div id="tabs" style="width: 100%;"></div>
 <div id="selected-tab" style="padding: 10px 0px">tab1</div>
 <div>
