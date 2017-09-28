@@ -123,7 +123,7 @@ class PatientsPreviewView(View):
             patients = set()
             for app in apps:
                 patients.add(app.patient)
-                
+
             context = {
                 'doctor': doctor,
                 'doctors_patients': patients
