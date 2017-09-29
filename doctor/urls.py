@@ -21,7 +21,8 @@ urlpatterns = [
     url(r'^ajax/remove_self_as_gp/$', utils.remove_self_as_gp, name='remove_self_as_gp'),
     url(r'^ajax/add_self_as_gp/$', utils.add_self_as_gp, name='add_self_as_gp'),
     url(r'^ajax/remove_report_from_appointment/$', utils.remove_report_from_appointment, name='remove_report'),
-    url(r'^ajax/get_patient_list/$', utils.get_patients_list, name='patient_list')
+    url(r'^ajax/get_patient_list/$', utils.get_patients_list, name='patient_list'),
+    url(r'^ajax/get_appointments_list/$', utils.get_appointments_list, name='appointments_list')
 ]
 
 # /ajax/get_times_available/

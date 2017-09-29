@@ -27,9 +27,9 @@ def homepage(request, doctor_id):
     # TODO =============================================================================================================
     doctor = Doctor.objects.get(user__pk=request.user.id)
     if not doctor.is_general_practitioner:
-        apps = Appointment.objects.filter(doctor__user__id=request.user.id).exclude(report=None)
-        old_appointments = doctor.appointment_set.exclude(report=None)
-        upcoming_appointments = doctor.appointment_set.filter(report=None)
+        apps = Appointment.objects.filter(doctor__user__id=request.user.id).exclude(has_report_added=False)
+        old_appointments = doctor.appointment_set.exclude(has_report_added=False)
+        upcoming_appointments = doctor.appointment_set.filter(has_report_added=False)
         patients = set()
         for app in apps:
             patients.add(app.patient)
@@ -138,7 +138,7 @@ class PatientsPreviewView(View):
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user__pk=request.user.id)
         if not doctor.is_general_practitioner:
-            apps = Appointment.objects.filter(doctor__user__id=request.user.id).exclude(report=None)
+            apps = Appointment.objects.filter(doctor__user__id=request.user.id).exclude(has_report_added=False)
             patients = set()
             for app in apps:
                 patients.add(app.patient)
@@ -169,7 +169,7 @@ class OldAppointmentsView(View):
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user__pk=request.user.id)
         # appointments = doctor.appointment_set.filter(date__lt=datetime.date.today())
-        appointments = doctor.appointment_set.exclude(report=None)
+        appointments = doctor.appointment_set.exclude(has_report_added=False)
         context = {
             'doctor': doctor,
             'appointments': appointments
@@ -186,7 +186,7 @@ class UpcomingAppointmentsView(View):
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user__pk=request.user.id)
         # appointments = doctor.appointment_set.exclude(date__lt=datetime.date.today())
-        appointments = doctor.appointment_set.filter(report=None)
+        appointments = doctor.appointment_set.filter(has_report_added=False)
         context = {
             'doctor': doctor,
             'appointments': appointments
@@ -211,6 +211,8 @@ class AddReportView(View):
             report = form.save(commit=False)
             report.appointment = appointment
             report.save()
+            appointment.has_report_added = True
+            appointment.save()
             return redirect('doctor:appointment_details', doctor_id=doctor_id, appointment_id=appointment_id)
         except Appointment.DoesNotExist:
             return Http404("Не постои прегледот!")
@@ -228,8 +230,8 @@ def patientDetails(request, doctor_id, patient_id):
     patient = Patient.objects.get(user__id=patient_id)
     appointments = Appointment.objects.filter(patient__user__id=patient_id)     # list of all doctors that the patinet had a appointment with
 
-    past_appointments = Appointment.objects.filter(patient__user__id=patient_id).exclude(report=None)
-    future_appointments = Appointment.objects.filter(patient__user__id=patient_id).filter(report=None)
+    past_appointments = Appointment.objects.filter(patient__user__id=patient_id).exclude(has_report_added=False)
+    future_appointments = Appointment.objects.filter(patient__user__id=patient_id).filter(has_report_added=False)
 
     context = {
         'patient': patient,

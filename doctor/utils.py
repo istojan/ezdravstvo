@@ -104,7 +104,7 @@ def get_patients_list(request):
     data = []
     # doctor = Doctor.objects.get(user__pk=request.user.id)
     if not doctor.is_general_practitioner:
-        apps = Appointment.objects.filter(doctor__user__id=request.user.id).exclude(report=None)
+        apps = Appointment.objects.filter(doctor__user__id=request.user.id).filter(has_report_added=True)
         patients = set()
         for app in apps:
             patients.add(app.patient)
@@ -114,11 +114,6 @@ def get_patients_list(request):
         for patient in patients:
             total += 1
             data.append({'name': patient.name, 'surname': patient.surname, 'email': patient.user.email, 'patient_id': patient.user.id})
-
-        #     data.append({'id': doctor.id, 'name': "%s %s" % (doctor.name, doctor.surname)})
-        # context = {
-        #     'doctors_patients': patients
-        # }
         return JsonResponse({'total': total, 'patients': data})
     else:
         doctors_patients = doctor.patient_set.all()
@@ -129,5 +124,34 @@ def get_patients_list(request):
         }
 
 
+
+    return JsonResponse({'response': context})
+
+
+def get_appointments_list(request):
+    doctor = request.user.doctor
+    print(doctor.id)
+    data = []
+    # doctor = Doctor.objects.get(user__pk=request.user.id)
+    if not doctor.is_general_practitioner:
+        apps = Appointment.objects.filter(doctor__user__id=request.user.id).filter(has_report_added=False)
+
+        total = 0
+
+        for app in apps:
+            total += 1
+            data.append({'app_num': app.appointment_number, 'app_id': app.id, 'patient_name': app.patient.__str__(),
+                         'date': app.date, 'time': app.time})
+        # data.append({'patients': patients})
+        print("Returning apps")
+
+        return JsonResponse({'total': total, 'apps': data})
+    else:
+        doctors_patients = doctor.patient_set.all()
+        patients_without_gp = Patient.objects.filter(general_practitioner=None)
+        context = {
+            'doctors_patients': doctors_patients,
+            'patients_without_gp': patients_without_gp
+        }
 
     return JsonResponse({'response': context})

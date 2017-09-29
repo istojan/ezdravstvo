@@ -22,8 +22,6 @@
 
     <h1>Специјалист доктор</h1>
 
-{#    <div id="tabs" style="width: 100%;"></div>#}
-
     <div id="tab-example" style="margin-top: 20px;">
 			<div id="tabs" style="width: 100%; height: 29px;"></div>
 			<div id="tab1" class="tab">
@@ -40,6 +38,13 @@
                     <h4>Специјализација</h4>
                     Специјалист (да наведеме некако специјализации...)
                 </div>
+
+                <button>
+                    <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
+                        Make appointment
+                    </a>
+                </button>
+
             </div>
             <div id="tab2" class="tab">
                 <h4>Преглед на пациенти</h4>
@@ -49,6 +54,8 @@
             </div>
             <div id="tab3" class="tab">
                 <h4>Закажани прегледи</h4>
+                <div id="grid2" style="height: 700px"></div>
+                <button onclick="display_appointment_details();">Прикажи преглед</button>
             </div>
     </div>
 
@@ -92,7 +99,7 @@
 						    populate_patients_list();
                         }
                         else if(event.target == 'tab3'){
-                            show_upcoming_appointments();
+                            populate_appointments_list();
                         }
 						console.log(event.target + " showing now")
 					}
@@ -124,13 +131,44 @@
                         patients_list_populated = false
                         populate_patients_list()
                     }
-                }
+                },
+                grid2 : {
+				    name: 'grid2',
+                    show: {
+                        toolbar: true,
+                        footer: true,
+                    },
+                    multiSearch: true,
+                    searches: [
+                        { field: 'recid', caption: 'ID ', type: 'int' },
+                        { field: 'app_num', caption: 'Број на термин', type: 'text' },
+                        { field: 'patient_name', caption: 'Пациент', type: 'text' },
+                        { field: 'date', caption: 'Датум', type: 'date'},
+                        { field: 'time', caption: 'Време', type: 'time' }
+                    ],
+                    columns: [
+                        { field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
+                        { field: 'app_id', size: '0px', hidden: true},
+                        { field: 'app_num', caption: 'Број на термин', size: '30%', sortable: true },
+                        { field: 'patient_name', caption: 'Име на Пациент', size: '30%', sortable: true },
+                        { field: 'time', caption: 'Време', size: '40%' },
+                        { field: 'date', caption: 'Датум', render: 'date:yyyy-mm-dd', size: '120px' }
+                    ],
+                    onReload: function (event) {
+                        console.log("Trying to reload")
+                        appointments_list_populated = false
+                        populate_appointments_list()
+                    }
+                },
+
     };
 
     list_patients = null
     patients_list_populated = false
+    appointments_list_populated = false
 
-    current_rec_id = 1
+    current_rec_id_patients = 1
+    current_rec_id_apps = 1
     
     function display_patient_details() {
         // first get patient.user.id
@@ -146,8 +184,48 @@
             var url_to_patient = '/doctor/' + {{ request.user.id }} + '/' + patient_id;
             window.location = document.location.origin + url_to_patient
         }
+    }
 
+    function display_appointment_details() {
+        // first get app.id
+        recid = w2ui.grid2.getSelection()
+        if(recid.length == 0){
+            w2alert("Немате селектирано преглед")
+        }
+        else{
+            var record = w2ui.grid2.get(recid);
+            app_id = record[0].app_id;
 
+            // shabanski fix
+            var url_to_app = '/doctor/' + {{ request.user.id }} + '/appointment/' + app_id;
+            window.location = document.location.origin + url_to_app
+        }
+    }
+
+    function populate_appointments_list() {
+        if(!appointments_list_populated){
+            $('#grid2').w2grid(config.grid2);
+            w2ui.grid2.clear();
+            current_rec_id_apps = 1
+
+            $.ajax({
+                url: '{% url 'doctor:appointments_list' %}',
+                dataType: 'json',
+                success: function(response) {
+                    total = response.total
+                    console.log("Total " + total)
+                    for(i = 0 ; i < total ; i++){
+                        console.log(response.apps[i].app_num)
+                        console.log(response.apps[i].app_id)
+                        console.log(response.apps[i].date)
+                        w2ui['grid2'].add([{recid: current_rec_id_apps, app_id: response.apps[i].app_id, app_num: response.apps[i].app_num, patient_name: response.apps[i].patient_name, date: response.apps[i].date, time: response.apps[i].time}]);
+                        current_rec_id_apps += 1
+                    }
+                }
+            });
+            appointments_list_populated = true
+            w2ui.grid2.refresh();
+        }
     }
     
     function populate_patients_list() {
@@ -155,7 +233,7 @@
         if(!patients_list_populated){
             $('#grid').w2grid(config.grid);
             w2ui.grid1.clear();
-            current_rec_id = 1
+            current_rec_id_patients = 1
 
             $.ajax({
                 url: '{% url 'doctor:patient_list' %}',
@@ -168,8 +246,8 @@
                         console.log(response.patients[i].surname)
                         console.log(response.patients[i].email)
                         console.log(response.patients[i].patient_id)
-                        w2ui['grid1'].add([{recid: current_rec_id, fname: response.patients[i].name, lname: response.patients[i].surname, email: response.patients[i].email, sdate: '10/15/2016', patient_id: response.patients[i].patient_id}]);
-                        current_rec_id += 1
+                        w2ui['grid1'].add([{recid: current_rec_id_patients, fname: response.patients[i].name, lname: response.patients[i].surname, email: response.patients[i].email, sdate: '10/15/2016', patient_id: response.patients[i].patient_id}]);
+                        current_rec_id_patients += 1
                     }
                 }
             });
