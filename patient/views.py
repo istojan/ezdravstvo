@@ -10,8 +10,8 @@ from login.models import Patient, Report, Appointment
 def homepage(request, patient_id):
     # TODO Check patient_id == user_id
     patient = Patient.objects.get(user__pk=request.user.id)
-    old_appointments1 = patient.appointment_set.exclude(report=None)
-    upcoming_appointments1 = patient.appointment_set.filter(report=None)
+    old_appointments1 = patient.appointment_set.exclude(has_report_added=False)
+    upcoming_appointments1 = patient.appointment_set.filter(has_report_added=False)
     return render(request, 'patient/homepage.html', {
         'patient': patient,
         'old_appointments': old_appointments1,
@@ -22,7 +22,7 @@ def homepage(request, patient_id):
 @login_required(login_url='login:index')
 def old_appointments(request, patient_id):
     patient = Patient.objects.get(user__pk=request.user.id)
-    appointments = patient.appointment_set.exclude(report=None)
+    appointments = patient.appointment_set.exclude(has_report_added=False)
     return render(request, 'patient/old_appointments.html', {'appointments': appointments,
                                                              'patient': patient})
 
@@ -30,7 +30,7 @@ def old_appointments(request, patient_id):
 @login_required(login_url='login:index')
 def upcoming_appointments(request, patient_id):
     patient = Patient.objects.get(user__pk=request.user.id)
-    appointments = patient.appointment_set.filter(report=None)
+    appointments = patient.appointment_set.filter(has_report_added=False)
     return render(request, 'patient/upcoming_appointments.html', {'patient': patient,
                                                                   'appointments': appointments})
 
