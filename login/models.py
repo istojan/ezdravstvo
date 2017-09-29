@@ -100,6 +100,7 @@ class Appointment(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.DO_NOTHING)
     date = models.DateField()
     time = models.TimeField()
+    has_report_added = models.BooleanField(default=False)
     # Verojatno e podobro da bide so DateTimeFiled
     # date_time = models.DateTimeField()
 
