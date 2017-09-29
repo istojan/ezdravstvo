@@ -49,7 +49,11 @@
             "    email: <b>{{ patient.user.email }}</b><br/>\n" +
             "    Матичен доктор: <b>{{ patient.general_practitioner }}</b><br/>\n" +
             "    <a href=\"{% url 'login:logout_user' %}\">Одјави се</a>" +
-            "    </div>";
+            "    </div>" +
+            "<button id=\"btn_change_password\">\n" +
+            "    Промени лозинка\n" +
+            "</button>";
+
         $('#selected-tab').html(html);
     }
 
@@ -159,7 +163,7 @@
                             "                    Доктор: <b>" + app['doctor'] + "</b><br/>\n" +
                             "                    Датум: <b>" + app['date'] + "</b><br/>\n" +
                             "                    Време: <b>" + app['time'] + "</b><br/>\n" +
-{#                            "                    <a href=\"{% url 'patient:appointment_details' patient_id=patient.user.id appointment_id=appointment.id %}\">Извештај</a>\n" +#}
+                            {#                            "                    <a href=\"{% url 'patient:appointment_details' patient_id=patient.user.id appointment_id=appointment.id %}\">Извештај</a>\n" +#}
                             "                </div>\n" +
                             "            </li>"
                     }
@@ -200,7 +204,7 @@
                             "                    Доктор: <b>" + app['doctor'] + "</b><br/>\n" +
                             "                    Датум: <b>" + app['date'] + "</b><br/>\n" +
                             "                    Време: <b>" + app['time'] + "</b><br/>\n" +
-{#                            "                    <a href=\"{% url 'patient:appointment_details' patient_id=appointment.patient.user.id appointment_id=appointment.id %}\">Извештај</a>\n" +#}
+                            {#                            "                    <a href=\"{% url 'patient:appointment_details' patient_id=appointment.patient.user.id appointment_id=appointment.id %}\">Извештај</a>\n" +#}
                             "                </div>\n" +
                             "            </li>"
                     }
@@ -237,9 +241,100 @@
         });
     });
 
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    function validate() {
+        var old_pass = $('#old_pass').val();
+        var new_pass = $('#new_pass').val();
+        var confirm_pass = $('#confirm_pass').val();
+        if (old_pass.trim() == "" || new_pass.trim() == "" || confirm_pass == "") {
+            $('#error_text').html("Мора да ги внесете сите полиња!");
+            return false;
+        }
+        if (new_pass != confirm_pass) {
+            $('#error_text').html("Новата лозинка не поклопува со потврдата!");
+            return false;
+        }
+        return true;
+    }
+
+    function open_popup() {
+        w2popup.open({
+            title: 'Промена на лозинка',
+            body: "Стара лозинка: <input type=\"password\" id=\"old_pass\"><br/><br/>\n" +
+            "Нова лозинка: <input type=\"password\" id=\"new_pass\"><br/><br/>\n" +
+            "Потврдете лозинка: <input type=\"password\" id=\"confirm_pass\"><br/><br/>\n" +
+            "<div id=\"error_text\" style=\"color:red;\"></div><br/>" +
+            "<button id=\"btn_confirm\">Потврди</button>"
+        });
+        $('#btn_confirm').on('click', function (event) {
+            console.log("Pressed");
+            if (validate()) {
+                var old_pass = $('#old_pass').val();
+                var new_pass = $('#new_pass').val();
+                var confirm_pass = $('#confirm_pass').val();
+                attempt_change_password(old_pass, new_pass, confirm_pass);
+            }
+        });
+    }
+
+    function go_to_login() {
+        location.href = '{% url 'login:index' %}';
+    }
+
+    function attempt_change_password(old_password, new_password, confirm_password) {
+        var csrftoken = getCookie('csrftoken');
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'patient:change_user_password' %}',
+            data: {
+                'old_password': old_password,
+                'new_password': new_password,
+                'confirm_password': confirm_password
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.hasOwnProperty('error')) {
+                    alert(response['error'])
+                } else {
+                    go_to_login();
+                }
+            }
+        });
+    }
+
     $(document).ready(function () {
-                show_personal_info();
-{#        show_personal_info_ajax();#}
+        show_personal_info();
+        var csrftoken = getCookie('csrftoken');
+        $('#btn_change_password').on('click', function (event) {
+            open_popup();
+        });
     });
 </script>
 </body>

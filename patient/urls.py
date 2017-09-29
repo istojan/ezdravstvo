@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^ajax/get_patient_personal_info/$', utils.get_patient_personal_info, name='get_patient_personal_info'),
     url(r'^ajax/get_old_appointments/$', utils.get_old_appointments, name='get_old_appointments'),
     url(r'^ajax/get_upcoming_appointments/$', utils.get_upcoming_appointments, name='get_upcoming_appointments'),
+    url(r'^ajax/change_password/$', utils.change_user_password, name='change_user_password'),
 ]

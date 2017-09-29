@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.http import JsonResponse
 
 from login.models import Patient
@@ -72,3 +73,21 @@ def get_upcoming_appointments(request):
             return JsonResponse({'error': response})
     else:
         return JsonResponse({'error': response})
+
+
+def change_user_password(request):
+    user_id = request.user.id
+    old_password = request.POST['old_password']
+    new_password = request.POST['new_password']
+    confirm_password = request.POST['confirm_password']
+    try:
+        user = User.objects.get(pk=user_id)
+        if not user.check_password(old_password):
+            return JsonResponse({'error': 'Error changing password.'})
+        if new_password != confirm_password:
+            return JsonResponse({'error': 'Error changing password.'})
+        user.set_password(new_password)
+        user.save()
+        return JsonResponse({'response': 'Successfully changed password.'})
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Error changing password.'})

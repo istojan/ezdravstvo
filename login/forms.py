@@ -30,7 +30,7 @@ class PatientRegistrationForm(UserCreationForm):
     surname = forms.CharField(label="Презиме", max_length=30)
     ssn = forms.CharField(label="Матичен број", min_length=13, max_length=13)
     date_of_birth = forms.DateField(label="Датум на раѓање", widget=SelectDateWidget(years=range(1900, 2017)))
-    address = forms.CharField(label="", max_length=30)
+    address = forms.CharField(label="Адреса", max_length=30)
     hospital = forms.ModelChoiceField(label="Здравствена установа",
                                       required=False,
                                       queryset=Hospital.objects.all(),
