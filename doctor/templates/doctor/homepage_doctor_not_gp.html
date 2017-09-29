@@ -6,88 +6,244 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script type="text/javascript" src="//rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>
     <link rel="stylesheet" type="text/css" href="//rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css"/>
+
+    <style>
+        .tab {
+            width: 100%;
+            display: none;
+        }
+
+    </style>
+
 </head>
 <body>
-<h1>Специјалист доктор</h1>
 
-<div id="tabs" style="width: 100%;"></div>
+<div id="body_container_id">
 
-<div id="selected-tab" style="padding: 10px 0px">tab1</div>
-<div>
+    <h1>Специјалист доктор</h1>
+
+{#    <div id="tabs" style="width: 100%;"></div>#}
+
+    <div id="tab-example" style="margin-top: 20px;">
+			<div id="tabs" style="width: 100%; height: 29px;"></div>
+			<div id="tab1" class="tab">
+                <div>
+                    <h4>Лични информации</h4>
+
+                    Име: {{ doctor.name }} <br>
+                    Презиме: {{ doctor.surname }} <br>
+                    Докторска идентификација: {{ doctor.doctor_id }} <br>
+                    Everything else...
+
+                </div>
+                <div>
+                    <h4>Специјализација</h4>
+                    Специјалист (да наведеме некако специјализации...)
+                </div>
+            </div>
+            <div id="tab2" class="tab">
+                <h4>Преглед на пациенти</h4>
+{#                <div id="grid" style="height: 900px; width: 1500px"></div>                #}
+                <div id="grid" style="height: 700px"></div>
+                <button onclick="display_patient_details();">Детални информации за селектираниот пациент</button>
+            </div>
+            <div id="tab3" class="tab">
+                <h4>Закажани прегледи</h4>
+            </div>
+    </div>
+
+{#    <div id="selected-tab" style="padding: 10px 0px">tab1</div>#}
+{#    <div>#}
+{#        <button>#}
+{#            <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">#}
+{#                Make appointment#}
+{#            </a>#}
+{#        </button>#}
+{#    </div>#}
     <button>
-        <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
-            Make appointment
+        <a href="{% url 'login:logout_user' %}">
+            Logout
         </a>
     </button>
+
 </div>
-<button>
-    <a href="{% url 'login:logout_user' %}">
-        Logout
-    </a>
-</button>
 
 <script type="text/javascript">
 
-    function show_personal_info() {
-        var html = "" +
-            "<div>\n" +
-            "    <h4>Лични информации</h4>\n" +
-            "    Име: {{ doctor.name }} <br>\n" +
-            "    Презиме: {{ doctor.surname }} <br>\n" +
-            "    Докторска идентификација: {{ doctor.doctor_id }} <br>\n" +
-            "    Everything else...\n" +
-            "</div>\n" +
-            "\n" +
-            "<div>\n" +
-            "    <h4>Специјализација</h4>\n" +
-            "\n" +
-            "    Специјалист (да наведеме некако специјализации...)\n" +
-            "</div>";
-        $('#selected-tab').html(html);
+    var config = {
+				tabs : {
+					name : 'tabs',
+					active : 'tab1',
+					tabs : [ {
+						id : 'tab1',
+						caption : 'Лични информации'
+					}, {
+						id : 'tab2',
+						caption : 'Преглед на пациенти'
+					}, {
+						id : 'tab3',
+						caption : 'Закажани прегледи'
+					}, ],
+					onClick : function(event) {
+						$('#tab-example .tab').hide();
+
+						$('#tab-example #' + event.target).show();
+                        if(event.target == 'tab2'){
+						    populate_patients_list();
+                        }
+                        else if(event.target == 'tab3'){
+                            show_upcoming_appointments();
+                        }
+						console.log(event.target + " showing now")
+					}
+				},
+				grid : {
+				    name: 'grid1',
+                    show: {
+                        toolbar: true,
+                        footer: true,
+                    },
+                    multiSearch: true,
+                    searches: [
+                        { field: 'recid', caption: 'ID ', type: 'int' },
+                        { field: 'lname', caption: 'Last Name', type: 'text' },
+                        { field: 'fname', caption: 'First Name', type: 'text' },
+                        { field: 'email', caption: 'Email', type: 'text'},
+                        { field: 'sdate', caption: 'Start Date', type: 'date' }
+                    ],
+                    columns: [
+                        { field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
+                        { field: 'patient_id', size: '0px', hidden: true},
+                        { field: 'lname', caption: 'Last Name', size: '30%', sortable: true },
+                        { field: 'fname', caption: 'First Name', size: '30%', sortable: true },
+                        { field: 'email', caption: 'Email', size: '40%' },
+                        { field: 'sdate', caption: 'Start Date', render: 'date:mm/dd/yyyy', size: '120px' }
+                    ],
+                    onReload: function (event) {
+                        console.log("Trying to reload")
+                        patients_list_populated = false
+                        populate_patients_list()
+                    }
+                }
+    };
+
+    list_patients = null
+    patients_list_populated = false
+
+    current_rec_id = 1
+    
+    function display_patient_details() {
+        // first get patient.user.id
+        recid = w2ui.grid1.getSelection()
+        if(recid.length == 0){
+            w2alert("Немате селектирано пациент")
+        }
+        else{
+            var record = w2ui.grid1.get(recid);
+            patient_id = record[0].patient_id;
+
+            // shabanski fix
+            var url_to_patient = '/doctor/' + {{ request.user.id }} + '/' + patient_id;
+            window.location = document.location.origin + url_to_patient
+        }
+
+
+    }
+    
+    function populate_patients_list() {
+
+        if(!patients_list_populated){
+            $('#grid').w2grid(config.grid);
+            w2ui.grid1.clear();
+            current_rec_id = 1
+
+            $.ajax({
+                url: '{% url 'doctor:patient_list' %}',
+                dataType: 'json',
+                success: function(response) {
+                    total = response.total
+                    console.log("Total " + total)
+                    for(i = 0 ; i < total ; i++){
+                        console.log(response.patients[i].name)
+                        console.log(response.patients[i].surname)
+                        console.log(response.patients[i].email)
+                        console.log(response.patients[i].patient_id)
+                        w2ui['grid1'].add([{recid: current_rec_id, fname: response.patients[i].name, lname: response.patients[i].surname, email: response.patients[i].email, sdate: '10/15/2016', patient_id: response.patients[i].patient_id}]);
+                        current_rec_id += 1
+                    }
+                }
+            });
+            patients_list_populated = true
+            w2ui.grid1.refresh();
+        }
+
     }
 
-    function show_patients_overview() {
-        var html = "" +
-            "<h3>Пациенти на {{ doctor.name }} {{ doctor.surname }}</h3>\n" +
-            "<h2>Прегледани пациенти:</h2>\n" +
-            "<ul>\n" +
-            "    {% for patient in doctors_patients %}\n"+
-                "        <li>\n"+
-                "            <div>\n"+
-                "                <a href=\"{% url 'doctor:patientDetails' request.user.id patient.user.id %}\"> {{ patient }} </a>\n"
-                +
-                "            </div>\n"+
-                "        </li>\n"+
-                "    {% endfor %}\n" +
-            "</ul>";
-        $('#selected-tab').html(html);
-    }
+    $(function() {
+        $('#tabs').w2tabs(config.tabs);
+        $('#tab1').show();
+    });
 
-    function show_old_appointments() {
-        var html = "" +
-            "<h3>Термини на {{ doctor.name }} {{ doctor.surname }}</h3>\n" +
-            "{% if old_appointments.count == 0 %}\n"+
-                "    <div>\n"+
-                "        <i>Историјата на термини е празна.</i>\n"+
-                "    </div>\n"+
-                "{% else %}\n"+
-                "    <ul>\n"+
-                "        {% for appointment in old_appointments %}\n"+
-                    "            <li>\n"+
-                    "                <div style=\"border: solid; color: mediumaquamarine;\">\n"+
-                    "                    Број на термин: <b>{{ appointment.appointment_number }}</b><br/>\n"+
-                    "                    Пациент: <b>{{ appointment.patient }}</b><br/>\n"+
-                    "                    Датум: <b>{{ appointment.date }}</b><br/>\n"+
-                    "                    Време: <b>{{ appointment.time }}</b><br/>\n"+
-                    "                    <a href=\"{% url 'doctor:appointment_details' doctor_id=appointment.doctor.user.id appointment_id=appointment.id %}\">Извештај</a>\n"
-                    +
-                    "                </div>\n"+
-                    "            </li>\n"+
-                    "        {% endfor %}\n"+
-                "    </ul>\n"+
-                "{% endif %}";
-        $('#selected-tab').html(html);
-    }
+{#    function show_personal_info() {#}
+{#        var html = "" +#}
+{#            "<div>\n" +#}
+{#            "    <h4>Лични информации</h4>\n" +#}
+{#            "    Име: {{ doctor.name }} <br>\n" +#}
+{#            "    Презиме: {{ doctor.surname }} <br>\n" +#}
+{#            "    Докторска идентификација: {{ doctor.doctor_id }} <br>\n" +#}
+{#            "    Everything else...\n" +#}
+{#            "</div>\n" +#}
+{#            "\n" +#}
+{#            "<div>\n" +#}
+{#            "    <h4>Специјализација</h4>\n" +#}
+{#            "\n" +#}
+{#            "    Специјалист (да наведеме некако специјализации...)\n" +#}
+{#            "</div>";#}
+{#        $('#selected-tab').html(html);#}
+{#    }#}
+{##}
+{#    function show_patients_overview() {#}
+{#        var html = "" +#}
+{#            "<h3>Пациенти на {{ doctor.name }} {{ doctor.surname }}</h3>\n" +#}
+{#            "<h2>Прегледани пациенти:</h2>\n" +#}
+{#            "<ul>\n" +#}
+{#            "    {% for patient in doctors_patients %}\n"+#}
+{#                "        <li>\n"+#}
+{#                "            <div>\n"+#}
+{#                "                <a href=\"{% url 'doctor:patientDetails' request.user.id patient.user.id %}\"> {{ patient }} </a>\n"#}
+{#                +#}
+{#                "            </div>\n"+#}
+{#                "        </li>\n"+#}
+{#                "    {% endfor %}\n" +#}
+{#            "</ul>";#}
+{#        $('#selected-tab').html(html);#}
+{#    }#}
+{##}
+{#    function show_old_appointments() {#}
+{#        var html = "" +#}
+{#            "<h3>Термини на {{ doctor.name }} {{ doctor.surname }}</h3>\n" +#}
+{#            "{% if old_appointments.count == 0 %}\n"+#}
+{#                "    <div>\n"+#}
+{#                "        <i>Историјата на термини е празна.</i>\n"+#}
+{#                "    </div>\n"+#}
+{#                "{% else %}\n"+#}
+{#                "    <ul>\n"+#}
+{#                "        {% for appointment in old_appointments %}\n"+#}
+{#                    "            <li>\n"+#}
+{#                    "                <div style=\"border: solid; color: mediumaquamarine;\">\n"+#}
+{#                    "                    Број на термин: <b>{{ appointment.appointment_number }}</b><br/>\n"+#}
+{#                    "                    Пациент: <b>{{ appointment.patient }}</b><br/>\n"+#}
+{#                    "                    Датум: <b>{{ appointment.date }}</b><br/>\n"+#}
+{#                    "                    Време: <b>{{ appointment.time }}</b><br/>\n"+#}
+{#                    "                    <a href=\"{% url 'doctor:appointment_details' doctor_id=appointment.doctor.user.id appointment_id=appointment.id %}\">Извештај</a>\n"#}
+{#                    +#}
+{#                    "                </div>\n"+#}
+{#                    "            </li>\n"+#}
+{#                    "        {% endfor %}\n"+#}
+{#                "    </ul>\n"+#}
+{#                "{% endif %}";#}
+{#        $('#selected-tab').html(html);#}
+{#    }#}
 
     function show_upcoming_appointments() {
         var html = "" +
@@ -112,42 +268,42 @@
                     "        {% endfor %}\n"+
                 "    </ul>\n"+
                 "{% endif %}";
-        $('#selected-tab').html(html);
+        $('#tab3').html(html);
     }
 
-    $(function () {
-        $('#tabs').w2tabs({
-            name: 'tabs',
-            active: 'personal_info',
-            tabs: [
-                {id: 'personal_info', text: 'Лични информации'},
-                {id: 'patients_overview', text: 'Преглед на пациенти'},
-                {id: 'old_appointments', text: 'Изминати термини/прегледи'},
-                {id: 'upcoming_appointments', text: 'Закажани термини/прегледи'}
-            ],
-            onClick: function (event) {
-                var tab_id = event.target;
-                switch (tab_id) {
-                    case 'personal_info':
-                        show_personal_info();
-                        break;
-                    case 'patients_overview':
-                        show_patients_overview();
-                        break;
-                    case 'old_appointments':
-                        show_old_appointments();
-                        break;
-                    case 'upcoming_appointments':
-                        show_upcoming_appointments();
-                        break;
-                }
-            }
-        });
-    });
-
-    $(document).ready(function () {
-        show_personal_info();
-    });
+{#    $(function () {#}
+{#        $('#tabs').w2tabs({#}
+{#            name: 'tabs',#}
+{#            active: 'personal_info',#}
+{#            tabs: [#}
+{#                {id: 'personal_info', text: 'Лични информации'},#}
+{#                {id: 'patients_overview', text: 'Преглед на пациенти'},#}
+{#                {id: 'old_appointments', text: 'Изминати термини/прегледи'},#}
+{#                {id: 'upcoming_appointments', text: 'Закажани термини/прегледи'}#}
+{#            ],#}
+{#            onClick: function (event) {#}
+{#                var tab_id = event.target;#}
+{#                switch (tab_id) {#}
+{#                    case 'personal_info':#}
+{#                        show_personal_info();#}
+{#                        break;#}
+{#                    case 'patients_overview':#}
+{#                        show_patients_overview();#}
+{#                        break;#}
+{#                    case 'old_appointments':#}
+{#                        show_old_appointments();#}
+{#                        break;#}
+{#                    case 'upcoming_appointments':#}
+{#                        show_upcoming_appointments();#}
+{#                        break;#}
+{#                }#}
+{#            }#}
+{#        });#}
+{#    });#}
+{##}
+{#    $(document).ready(function () {#}
+{#        show_personal_info();#}
+{#    });#}
 </script>
 </body>
 </html>
