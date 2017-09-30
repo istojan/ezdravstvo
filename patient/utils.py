@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 
-from login.models import Patient
+from login.models import Patient, Appointment
 
 
 def get_patient_personal_info(request):
@@ -91,3 +91,25 @@ def change_user_password(request):
         return JsonResponse({'response': 'Successfully changed password.'})
     except User.DoesNotExist:
         return JsonResponse({'error': 'Error changing password.'})
+
+def get_string_list_apps(apps):
+    total = 0
+    data = []
+
+    for app in apps:
+        total += 1
+        data.append({'app_num': app.appointment_number, 'app_id': app.id, 'patient_name': app.patient.__str__(),
+                     'date': app.date, 'time': app.time, 'ssn': app.patient.ssn})
+
+    return total, data
+
+def get_patient_apps_list(request):
+    patient_email = request.GET['patient_email']
+
+    apps_past = Appointment.objects.all().filter(patient__user__email=patient_email).filter(has_report_added=True)
+    apps_future = Appointment.objects.all().filter(patient__user__email=patient_email).filter(has_report_added=False)
+
+    total_past, apps_past_string = get_string_list_apps(apps_past)
+    total_future, apps_future_string = get_string_list_apps(apps_future)
+
+    return JsonResponse({'total_past': total_past, 'apps_past': apps_past_string, 'total_future': total_future, 'apps_future': apps_future_string})
