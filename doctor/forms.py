@@ -46,11 +46,12 @@ class AppointmentForm(forms.ModelForm):
 
 
 class AddReportForm(forms.ModelForm):
+    therapy = forms.CharField(label="Терапија", max_length=200, required=False)
+    remark = forms.CharField(label="Забелешка", max_length=200, required=False)
+
     class Meta:
         model = Report
         fields = ['diagnosis', 'therapy', 'remark']
         labels = {
-            'diagnosis': 'Дијагноза',
-            'therapy': 'Терапија',
-            'remark': 'Забелешка'
+            'diagnosis': 'Дијагноза'
         }
