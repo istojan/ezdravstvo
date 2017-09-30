@@ -44,7 +44,7 @@
                     {% endif %}
                     <br/>
                 </div>
-                <button id="btn_change_password">
+                <button id="btn_change_password" onclick="open_popup()">
                     Промени лозинка
                 </button>
 
@@ -536,13 +536,6 @@
         });
     }
 
-    $(document).ready(function () {
-        {#        show_personal_info();#}
-        var csrftoken = getCookie('csrftoken');
-        $('#btn_change_password').on('click', function (event) {
-            open_popup();
-        });
-    });
 </script>
 </body>
 </html>

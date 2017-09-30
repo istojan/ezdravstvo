@@ -23,46 +23,50 @@
     <h1>Матичен доктор</h1>
 
     <div id="tab-example" style="margin-top: 20px;">
-			<div id="tabs" style="width: 100%; height: 29px;"></div>
-			<div id="tab1" class="tab">
-                <div>
-                    <h3>Лични информации</h3>
+        <div id="tabs" style="width: 100%; height: 29px;"></div>
+        <div id="tab1" class="tab">
+            <div>
+                <h3>Лични информации</h3>
 
-                    Име: {{ doctor.name }} <br>
-                    Презиме: {{ doctor.surname }} <br>
-                    Докторска идентификација: {{ doctor.doctor_id }} <br>
-                    Everything else...
-
-                </div>
-                <div>
-                    <h3>Специјализација</h3>
-                    Специјалист (да наведеме некако специјализации...)
-                </div>
-
-                <button>
-                    <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
-                        Make appointment
-                    </a>
-                </button>
+                Име: {{ doctor.name }} <br>
+                Презиме: {{ doctor.surname }} <br>
+                Докторска идентификација: {{ doctor.doctor_id }} <br>
+                Everything else...
 
             </div>
-            <div id="tab2" class="tab">
-                <h3>Матични Пациенти</h3>
-                <div id="grid1" style="height: 700px"></div>
-                <button onclick="display_patient_details('gp');">Прикажи пациент</button>
+            <div>
+                <h3>Специјализација</h3>
+                Специјалист (да наведеме некако специјализации...)
             </div>
-            <div id="tab3" class="tab">
-                <h3>Пациенти без матичен доктор</h3>
-                <div id="grid2" style="height: 700px"></div>
-                <button onclick="display_patient_details('no_gp');">Прикажи пациент</button>
-            </div>
-            <div id="tab4" class="tab">
-                <h3>Минати прегледи</h3>
-                <div id="grid3" style="height: 700px"></div>
-                <button onclick="display_appointment_details();">Прикажи преглед</button>
-            </div>
+            <br/>
+            <button id="btn_change_password" onclick="open_popup()">
+                Промени лозинка
+            </button>
+            <br/><br/>
+            <button>
+                <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
+                    Make appointment
+                </a>
+            </button>
+
+        </div>
+        <div id="tab2" class="tab">
+            <h3>Матични Пациенти</h3>
+            <div id="grid1" style="height: 700px"></div>
+            <button onclick="display_patient_details('gp');">Прикажи пациент</button>
+        </div>
+        <div id="tab3" class="tab">
+            <h3>Пациенти без матичен доктор</h3>
+            <div id="grid2" style="height: 700px"></div>
+            <button onclick="display_patient_details('no_gp');">Прикажи пациент</button>
+        </div>
+        <div id="tab4" class="tab">
+            <h3>Минати прегледи</h3>
+            <div id="grid3" style="height: 700px"></div>
+            <button onclick="display_appointment_details();">Прикажи преглед</button>
+        </div>
     </div>
-
+    <br/>
     <button>
         <a href="{% url 'login:logout_user' %}">
             Logout
@@ -75,157 +79,157 @@
 
 
     var config = {
-				tabs : {
-					name : 'tabs',
-					active : 'tab1',
-					tabs : [ {
-						id : 'tab1',
-						caption : 'Лични информации'
-					}, {
-						id : 'tab2',
-						caption : 'Матични пациенти'
-					}, {
-						id : 'tab3',
-						caption : 'Слободни пациенти'
-					},{
-						id : 'tab4',
-						caption : 'Стари прегледи'
-					}, ],
-					onClick : function(event) {
-						$('#tab-example .tab').hide();
+        tabs: {
+            name: 'tabs',
+            active: 'tab1',
+            tabs: [{
+                id: 'tab1',
+                caption: 'Лични информации'
+            }, {
+                id: 'tab2',
+                caption: 'Матични пациенти'
+            }, {
+                id: 'tab3',
+                caption: 'Слободни пациенти'
+            }, {
+                id: 'tab4',
+                caption: 'Стари прегледи'
+            },],
+            onClick: function (event) {
+                $('#tab-example .tab').hide();
 
-						$('#tab-example #' + event.target).show();
-                        if(event.target == 'tab2' || event.target == 'tab3'){
-						    populate_patients_list();
-						    w2ui.grid1.refresh();
-                            w2ui.grid2.refresh();
-                        }
-                        else if(event.target == 'tab4'){
-                            populate_appointments_list();
-                        }
-						console.log(event.target + " showing now")
-					}
-				},
-				grid1 : {
-				    name: 'grid1',
-                    show: {
-                        toolbar: true,
-                        footer: true,
-                    },
-                    multiSearch: true,
-                    searches: [
-                        { field: 'recid', caption: 'ID', type: 'int' },
-                        { field: 'lname', caption: 'Презиме', type: 'text' },
-                        { field: 'fname', caption: 'Име', type: 'text' },
-                        { field: 'email', caption: 'Email', type: 'text'},
-                        { field: 'ssn', caption: 'Матичен број', type: 'text' }
-                    ],
-                    columns: [
-                        { field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
-                        { field: 'patient_id', size: '0px', hidden: true},
-                        { field: 'lname', caption: 'Презиме', size: '30%', sortable: true },
-                        { field: 'fname', caption: 'Име', size: '30%', sortable: true },
-                        { field: 'email', caption: 'Email', size: '40%' },
-                        { field: 'ssn', caption: 'Матичен број', size: '120px' }
-                    ],
-                    onReload: function (event) {
-                        console.log("Trying to reload")
-                        patients_list_populated = false
-                        populate_patients_list()
-                    }
-                },
-                grid2 : {
-				    name: 'grid2',
-                    show: {
-                        toolbar: true,
-                        footer: true,
-                    },
-                    multiSearch: true,
-                    searches: [
-                        { field: 'recid', caption: 'ID', type: 'int' },
-                        { field: 'lname', caption: 'Презиме', type: 'text' },
-                        { field: 'fname', caption: 'Име', type: 'text' },
-                        { field: 'email', caption: 'Email', type: 'text'},
-                        { field: 'ssn', caption: 'Матичен број', type: 'text' }
-                    ],
-                    columns: [
-                        { field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
-                        { field: 'patient_id', size: '0px', hidden: true},
-                        { field: 'lname', caption: 'Презиме', size: '30%', sortable: true },
-                        { field: 'fname', caption: 'Име', size: '30%', sortable: true },
-                        { field: 'email', caption: 'Email', size: '40%' },
-                        { field: 'ssn', caption: 'Матичен број', size: '120px' }
-                    ],
-                    onReload: function (event) {
-                        console.log("Trying to reload")
-                        patients_list_populated = false
-                        populate_patients_list()
-                    }
-                },
-                grid3 : {
-				    name: 'grid3',
-                    show: {
-                        toolbar: true,
-                        footer: true,
-                    },
-                    multiSearch: true,
-                    searches: [
-                        { field: 'recid', caption: 'ID ', type: 'int' },
-                        { field: 'app_num', caption: 'Број на термин', type: 'text' },
-                        { field: 'patient_name', caption: 'Пациент', type: 'text' },
-                        { field: 'ssn', caption: 'Матичен број', type: 'text' },
-                        { field: 'date', caption: 'Датум', type: 'date'}
-                    ],
-                    columns: [
-                        { field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
-                        { field: 'app_id', size: '0px', hidden: true},
-                        { field: 'app_num', caption: 'Број на термин', size: '30%', sortable: true },
-                        { field: 'patient_name', caption: 'Име на Пациент', size: '30%', sortable: true },
-                        { field: 'ssn', caption: 'Матичен број', size: '20%' },
-                        { field: 'date', caption: 'Датум', render: 'date:yyyy-mm-dd', size: '120px' }
-                    ],
-                    onReload: function (event) {
-                        console.log("Trying to reload")
-                        appointments_list_populated = false
-                        populate_appointments_list()
-                    }
-                },
+                $('#tab-example #' + event.target).show();
+                if (event.target == 'tab2' || event.target == 'tab3') {
+                    populate_patients_list();
+                    w2ui.grid1.refresh();
+                    w2ui.grid2.refresh();
+                }
+                else if (event.target == 'tab4') {
+                    populate_appointments_list();
+                }
+                console.log(event.target + " showing now")
+            }
+        },
+        grid1: {
+            name: 'grid1',
+            show: {
+                toolbar: true,
+                footer: true,
+            },
+            multiSearch: true,
+            searches: [
+                {field: 'recid', caption: 'ID', type: 'int'},
+                {field: 'lname', caption: 'Презиме', type: 'text'},
+                {field: 'fname', caption: 'Име', type: 'text'},
+                {field: 'email', caption: 'Email', type: 'text'},
+                {field: 'ssn', caption: 'Матичен број', type: 'text'}
+            ],
+            columns: [
+                {field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center'},
+                {field: 'patient_id', size: '0px', hidden: true},
+                {field: 'lname', caption: 'Презиме', size: '30%', sortable: true},
+                {field: 'fname', caption: 'Име', size: '30%', sortable: true},
+                {field: 'email', caption: 'Email', size: '40%'},
+                {field: 'ssn', caption: 'Матичен број', size: '120px'}
+            ],
+            onReload: function (event) {
+                console.log("Trying to reload")
+                patients_list_populated = false
+                populate_patients_list()
+            }
+        },
+        grid2: {
+            name: 'grid2',
+            show: {
+                toolbar: true,
+                footer: true,
+            },
+            multiSearch: true,
+            searches: [
+                {field: 'recid', caption: 'ID', type: 'int'},
+                {field: 'lname', caption: 'Презиме', type: 'text'},
+                {field: 'fname', caption: 'Име', type: 'text'},
+                {field: 'email', caption: 'Email', type: 'text'},
+                {field: 'ssn', caption: 'Матичен број', type: 'text'}
+            ],
+            columns: [
+                {field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center'},
+                {field: 'patient_id', size: '0px', hidden: true},
+                {field: 'lname', caption: 'Презиме', size: '30%', sortable: true},
+                {field: 'fname', caption: 'Име', size: '30%', sortable: true},
+                {field: 'email', caption: 'Email', size: '40%'},
+                {field: 'ssn', caption: 'Матичен број', size: '120px'}
+            ],
+            onReload: function (event) {
+                console.log("Trying to reload")
+                patients_list_populated = false
+                populate_patients_list()
+            }
+        },
+        grid3: {
+            name: 'grid3',
+            show: {
+                toolbar: true,
+                footer: true,
+            },
+            multiSearch: true,
+            searches: [
+                {field: 'recid', caption: 'ID ', type: 'int'},
+                {field: 'app_num', caption: 'Број на термин', type: 'text'},
+                {field: 'patient_name', caption: 'Пациент', type: 'text'},
+                {field: 'ssn', caption: 'Матичен број', type: 'text'},
+                {field: 'date', caption: 'Датум', type: 'date'}
+            ],
+            columns: [
+                {field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center'},
+                {field: 'app_id', size: '0px', hidden: true},
+                {field: 'app_num', caption: 'Број на термин', size: '30%', sortable: true},
+                {field: 'patient_name', caption: 'Име на Пациент', size: '30%', sortable: true},
+                {field: 'ssn', caption: 'Матичен број', size: '20%'},
+                {field: 'date', caption: 'Датум', render: 'date:yyyy-mm-dd', size: '120px'}
+            ],
+            onReload: function (event) {
+                console.log("Trying to reload")
+                appointments_list_populated = false
+                populate_appointments_list()
+            }
+        },
 
     };
 
     patients_list_populated = false
-    appointments_list_populated  = false
+    appointments_list_populated = false
 
     function display_patient_details(button_pushed) {
         // first get patient.user.id
-        if(button_pushed == 'gp'){
+        if (button_pushed == 'gp') {
             recid = w2ui.grid1.getSelection()
         }
-        else{
+        else {
             recid = w2ui.grid2.getSelection()
         }
 
-        if(recid.length == 0){
+        if (recid.length == 0) {
             w2alert("Немате селектирано пациент")
         }
-        else{
-            if(button_pushed == 'gp'){
+        else {
+            if (button_pushed == 'gp') {
                 var record = w2ui.grid1.get(recid);
             }
-            else{
+            else {
                 var record = w2ui.grid2.get(recid);
             }
             patient_id = record[0].patient_id;
 
             // shabanski fix
-            var url_to_patient = '/doctor/' + {{ request.user.id }} + '/' + patient_id;
+            var url_to_patient = '/doctor/' + {{ request.user.id }} +'/' + patient_id;
             window.location = document.location.origin + url_to_patient
         }
     }
 
     function populate_patients_list() {
 
-        if(!patients_list_populated){
+        if (!patients_list_populated) {
             $('#grid1').w2grid(config.grid1);
             $('#grid2').w2grid(config.grid2);
             w2ui.grid1.clear();
@@ -237,31 +241,43 @@
             $.ajax({
                 url: '{% url 'doctor:patient_list' %}',
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     total_gp = response.total_gp
                     total_no_gp = response.total_no_gp
                     console.log("Total_gp " + total_gp)
                     console.log("Total_no_gp " + total_no_gp)
 
                     // first we populate the first list of patients of which the doctor is a gp
-                    for(i = 0 ; i < total_gp ; i++){
+                    for (i = 0; i < total_gp; i++) {
                         console.log(response.patients_gp[i].name)
                         console.log(response.patients_gp[i].surname)
                         console.log(response.patients_gp[i].email)
                         console.log(response.patients_gp[i].patient_id)
-                        w2ui['grid1'].add([{recid: current_rec_id_patients_gp, fname: response.patients_gp[i].name, lname: response.patients_gp[i].surname, email: response.patients_gp[i].email,
-                            ssn: response.patients_gp[i].ssn, patient_id: response.patients_gp[i].patient_id}]);
+                        w2ui['grid1'].add([{
+                            recid: current_rec_id_patients_gp,
+                            fname: response.patients_gp[i].name,
+                            lname: response.patients_gp[i].surname,
+                            email: response.patients_gp[i].email,
+                            ssn: response.patients_gp[i].ssn,
+                            patient_id: response.patients_gp[i].patient_id
+                        }]);
                         current_rec_id_patients_gp += 1
                     }
 
                     // next we populate the second list with patients that currently have no gp
-                    for(i = 0 ; i < total_no_gp ; i++){
+                    for (i = 0; i < total_no_gp; i++) {
                         console.log(response.patients_no_gp[i].name)
                         console.log(response.patients_no_gp[i].surname)
                         console.log(response.patients_no_gp[i].email)
                         console.log(response.patients_no_gp[i].patient_id)
-                        w2ui['grid2'].add([{recid: current_rec_id_patients_no_gp, fname: response.patients_no_gp[i].name, lname: response.patients_no_gp[i].surname, email: response.patients_no_gp[i].email,
-                            ssn: response.patients_no_gp[i].ssn, patient_id: response.patients_no_gp[i].patient_id}]);
+                        w2ui['grid2'].add([{
+                            recid: current_rec_id_patients_no_gp,
+                            fname: response.patients_no_gp[i].name,
+                            lname: response.patients_no_gp[i].surname,
+                            email: response.patients_no_gp[i].email,
+                            ssn: response.patients_no_gp[i].ssn,
+                            patient_id: response.patients_no_gp[i].patient_id
+                        }]);
                         current_rec_id_patients_no_gp += 1
                     }
 
@@ -277,21 +293,21 @@
     function display_appointment_details() {
         // first get app.id
         recid = w2ui.grid3.getSelection()
-        if(recid.length == 0){
+        if (recid.length == 0) {
             w2alert("Немате селектирано преглед")
         }
-        else{
+        else {
             var record = w2ui.grid3.get(recid);
             app_id = record[0].app_id;
 
             // shabanski fix
-            var url_to_app = '/doctor/' + {{ request.user.id }} + '/appointment/' + app_id;
+            var url_to_app = '/doctor/' + {{ request.user.id }} +'/appointment/' + app_id;
             window.location = document.location.origin + url_to_app
         }
     }
 
     function populate_appointments_list() {
-        if(!appointments_list_populated){
+        if (!appointments_list_populated) {
             console.log("Populating app list")
             $('#grid3').w2grid(config.grid3);
             w2ui.grid3.clear();
@@ -300,21 +316,23 @@
             $.ajax({
                 url: '{% url 'doctor:appointments_list' %}',
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     total = response.total
                     console.log("Total " + total)
-                    for(i = 0 ; i < total ; i++){
+                    for (i = 0; i < total; i++) {
                         console.log(response.apps[i].app_num)
                         console.log(response.apps[i].app_id)
                         console.log(response.apps[i].date)
                         console.log(response.apps[i].ssn)
-                        w2ui['grid3'].add([{recid: current_rec_id_apps,
+                        w2ui['grid3'].add([{
+                            recid: current_rec_id_apps,
                             app_id: response.apps[i].app_id,
                             app_num: response.apps[i].app_num,
                             patient_name: response.apps[i].patient_name,
                             ssn: response.apps[i].ssn,
                             date: response.apps[i].date,
-                            time: response.apps[i].ssn}]);
+                            time: response.apps[i].ssn
+                        }]);
                         current_rec_id_apps += 1
                     }
                 }
@@ -324,90 +342,180 @@
         }
     }
 
-    $(function() {
+    $(function () {
         $('#tabs').w2tabs(config.tabs);
         $('#tab1').show();
     });
 
+    {#     CHANGE PASSWORD FUNCTIONALLITY BELLOW ==============================================================#}
 
 
-{#    function show_personal_info() {#}
-{#        var html = "" +#}
-{#            "\n" +#}
-{#            "<div>\n" +#}
-{#            "    <h4>Лични информации</h4>\n" +#}
-{#            "    Име: {{ request.user.doctor.name }} <br>\n" +#}
-{#            "    Презиме: {{ request.user.doctor.surname }} <br>\n" +#}
-{#            "    Докторска идентификација: {{ request.user.doctor.doctor_id }} <br>\n" +#}
-{#            "    Everything else...\n" +#}
-{#            "</div>\n" +#}
-{#            "\n" +#}
-{#            "<div>\n" +#}
-{#            "    <h4>Специјализација</h4>\n" +#}
-{#            "\n" +#}
-{#            "    Матичен доктор\n" +#}
-{#            "</div>";#}
-{#        $('#selected-tab').html(html);#}
-{#    }#}
-{##}
-{#    function show_patients_overview() {#}
-{#        var html = "" +#}
-{#            "<h3>Пациенти на {{ doctor.name }} {{ doctor.surname }}</h3>\n" +#}
-{#            "<h2>Матични пациенти:</h2>\n" +#}
-{#            "<ul>\n" +#}
-{#            "    {% for patient in doctors_patients %}\n"+#}
-{#                "        <li>\n"+#}
-{#                "            <div>\n"+#}
-{#                "                <a href=\"{% url 'doctor:patientDetails' request.user.id patient.user.id %}\"> {{ patient }} </a>\n"#}
-{#                +#}
-{#                "            </div>\n"+#}
-{#                "        </li>\n"+#}
-{#                "    {% endfor %}\n" +#}
-{#            "</ul>\n" +#}
-{#            "<h2>Пациенти без матичен доктор:</h2>\n" +#}
-{#            "<ul>\n" +#}
-{#            "    {% for patient in patients_without_gp %}\n"+#}
-{#                "        <li>\n"+#}
-{#                "            <div>\n"+#}
-{#                "                <a href=\"{% url 'doctor:patientDetails' request.user.id patient.user.id %}\"> {{ patient }} </a>\n"#}
-{#                +#}
-{#                "            </div>\n"+#}
-{#                "        </li>\n"+#}
-{#                "    {% endfor %}\n" +#}
-{#            "</ul>";#}
-{#        $('#selected-tab').html(html);#}
-{#    }#}
-{##}
-{#    function show_old_appointments() {#}
-{#        var html = "<b style=\"size:large;\">OVA NE E NAPRAVENO DEKA TREBA DA VIDIME KAKO</b>";#}
-{#        $('#selected-tab').html(html);#}
-{#    }#}
-{##}
-{#    $(function () {#}
-{#        $('#tabs').w2tabs({#}
-{#            name: 'tabs',#}
-{#            active: 'personal_info',#}
-{#            tabs: [#}
-{#                {id: 'personal_info', text: 'Лични информации'},#}
-{#                {id: 'patients_overview', text: 'Преглед на пациенти'},#}
-{#                {id: 'old_appointments', text: 'Стари прегледи'}#}
-{#            ],#}
-{#            onClick: function (event) {#}
-{#                var tab_id = event.target;#}
-{#                switch (tab_id) {#}
-{#                    case 'personal_info':#}
-{#                        show_personal_info();#}
-{#                        break;#}
-{#                    case 'patients_overview':#}
-{#                        show_patients_overview();#}
-{#                        break;#}
-{#                    case 'old_appointments':#}
-{#                        show_old_appointments();#}
-{#                        break;#}
-{#                }#}
-{#            }#}
-{#        });#}
-{#    });#}
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    function validate() {
+        var old_pass = $('#old_pass').val();
+        var new_pass = $('#new_pass').val();
+        var confirm_pass = $('#confirm_pass').val();
+        if (old_pass.trim() == "" || new_pass.trim() == "" || confirm_pass == "") {
+            $('#error_text').html("Мора да ги внесете сите полиња!");
+            return false;
+        }
+        if (new_pass != confirm_pass) {
+            $('#error_text').html("Новата лозинка не поклопува со потврдата!");
+            return false;
+        }
+        return true;
+    }
+
+    function attempt_change_password(old_password, new_password, confirm_password) {
+        var csrftoken = getCookie('csrftoken');
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'login:change_user_password' %}',
+            data: {
+                'old_password': old_password,
+                'new_password': new_password,
+                'confirm_password': confirm_password
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.hasOwnProperty('error')) {
+                    alert(response['error'])
+                } else {
+                    go_to_login();
+                }
+            }
+        });
+    }
+
+    function go_to_login() {
+        location.href = '{% url 'login:index' %}';
+    }
+
+    function open_popup() {
+        w2popup.open({
+            title: 'Промена на лозинка',
+            body: "Стара лозинка: <input type=\"password\" id=\"old_pass\"><br/><br/>\n" +
+            "Нова лозинка: <input type=\"password\" id=\"new_pass\"><br/><br/>\n" +
+            "Потврдете лозинка: <input type=\"password\" id=\"confirm_pass\"><br/><br/>\n" +
+            "<div id=\"error_text\" style=\"color:red;\"></div><br/>" +
+            "<button id=\"btn_confirm\">Потврди</button>"
+        });
+        $('#btn_confirm').on('click', function (event) {
+            console.log("Pressed");
+            if (validate()) {
+                var old_pass = $('#old_pass').val();
+                var new_pass = $('#new_pass').val();
+                var confirm_pass = $('#confirm_pass').val();
+                attempt_change_password(old_pass, new_pass, confirm_pass);
+            }
+        });
+    }
+
+
+    {#    function show_personal_info() {#}
+    {#        var html = "" +#}
+    {#            "\n" +#}
+    {#            "<div>\n" +#}
+    {#            "    <h4>Лични информации</h4>\n" +#}
+    {#            "    Име: {{ request.user.doctor.name }} <br>\n" +#}
+    {#            "    Презиме: {{ request.user.doctor.surname }} <br>\n" +#}
+    {#            "    Докторска идентификација: {{ request.user.doctor.doctor_id }} <br>\n" +#}
+    {#            "    Everything else...\n" +#}
+    {#            "</div>\n" +#}
+    {#            "\n" +#}
+    {#            "<div>\n" +#}
+    {#            "    <h4>Специјализација</h4>\n" +#}
+    {#            "\n" +#}
+    {#            "    Матичен доктор\n" +#}
+    {#            "</div>";#}
+    {#        $('#selected-tab').html(html);#}
+    {#    }#}
+    {##}
+    {#    function show_patients_overview() {#}
+    {#        var html = "" +#}
+    {#            "<h3>Пациенти на {{ doctor.name }} {{ doctor.surname }}</h3>\n" +#}
+    {#            "<h2>Матични пациенти:</h2>\n" +#}
+    {#            "<ul>\n" +#}
+    {#            "    {% for patient in doctors_patients %}\n"+#}
+    {#                "        <li>\n"+#}
+    {#                "            <div>\n"+#}
+    {#                "                <a href=\"{% url 'doctor:patientDetails' request.user.id patient.user.id %}\"> {{ patient }} </a>\n"#}
+    {#                +#}
+    {#                "            </div>\n"+#}
+    {#                "        </li>\n"+#}
+    {#                "    {% endfor %}\n" +#}
+    {#            "</ul>\n" +#}
+    {#            "<h2>Пациенти без матичен доктор:</h2>\n" +#}
+    {#            "<ul>\n" +#}
+    {#            "    {% for patient in patients_without_gp %}\n"+#}
+    {#                "        <li>\n"+#}
+    {#                "            <div>\n"+#}
+    {#                "                <a href=\"{% url 'doctor:patientDetails' request.user.id patient.user.id %}\"> {{ patient }} </a>\n"#}
+    {#                +#}
+    {#                "            </div>\n"+#}
+    {#                "        </li>\n"+#}
+    {#                "    {% endfor %}\n" +#}
+    {#            "</ul>";#}
+    {#        $('#selected-tab').html(html);#}
+    {#    }#}
+    {##}
+    {#    function show_old_appointments() {#}
+    {#        var html = "<b style=\"size:large;\">OVA NE E NAPRAVENO DEKA TREBA DA VIDIME KAKO</b>";#}
+    {#        $('#selected-tab').html(html);#}
+    {#    }#}
+    {##}
+    {#    $(function () {#}
+    {#        $('#tabs').w2tabs({#}
+    {#            name: 'tabs',#}
+    {#            active: 'personal_info',#}
+    {#            tabs: [#}
+    {#                {id: 'personal_info', text: 'Лични информации'},#}
+    {#                {id: 'patients_overview', text: 'Преглед на пациенти'},#}
+    {#                {id: 'old_appointments', text: 'Стари прегледи'}#}
+    {#            ],#}
+    {#            onClick: function (event) {#}
+    {#                var tab_id = event.target;#}
+    {#                switch (tab_id) {#}
+    {#                    case 'personal_info':#}
+    {#                        show_personal_info();#}
+    {#                        break;#}
+    {#                    case 'patients_overview':#}
+    {#                        show_patients_overview();#}
+    {#                        break;#}
+    {#                    case 'old_appointments':#}
+    {#                        show_old_appointments();#}
+    {#                        break;#}
+    {#                }#}
+    {#            }#}
+    {#        });#}
+    {#    });#}
 </script>
 
 </body>
