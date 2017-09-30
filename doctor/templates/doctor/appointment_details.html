@@ -47,9 +47,11 @@
             {{ appointment.report.remark }}
         </div>
     </div>
-    <div style="color: darkred" id="delete_report">
-        <i>ИЗБРИШИ ИЗВЕШТАЈ</i>
-    </div>
+    {% if appointment.doctor.id == request.user.doctor.id %}
+        <div style="color: darkred" id="delete_report">
+            <i>ИЗБРИШИ ИЗВЕШТАЈ</i>
+        </div>
+    {% endif %}
 {% else %}
     {% if request.user.doctor.id == appointment.doctor.id %}
         <div>

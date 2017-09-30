@@ -108,20 +108,20 @@ def get_patients_list(request):
             patients.add(app.patient)
 
         print("Returning patients")
-        data, total = get_list_patients(patients)
+        data, total = get_string_list_patients(patients)
 
         return JsonResponse({'total': total, 'patients': data})
     else:
         doctors_patients = doctor.patient_set.all()
         patients_without_gp = Patient.objects.filter(general_practitioner=None)
 
-        data_doctor_patients, total_doctor_patients = get_list_patients(doctors_patients)
-        data_no_gp_patients, total_no_gp_patients = get_list_patients(patients_without_gp)
+        data_doctor_patients, total_doctor_patients = get_string_list_patients(doctors_patients)
+        data_no_gp_patients, total_no_gp_patients = get_string_list_patients(patients_without_gp)
 
         return JsonResponse({'total_gp': total_doctor_patients, 'patients_gp': data_doctor_patients, 'total_no_gp': total_no_gp_patients, 'patients_no_gp': data_no_gp_patients})
 
 
-def get_list_patients(patients):
+def get_string_list_patients(patients):
     data = []
     total = 0
     for patient in patients:
@@ -130,30 +130,38 @@ def get_list_patients(patients):
                      'patient_id': patient.user.id, 'ssn': patient.ssn})
     return data, total
 
+
 def get_appointments_list(request):
     doctor = request.user.doctor
-    print(doctor.id)
-    data = []
-    # doctor = Doctor.objects.get(user__pk=request.user.id)
+
     if not doctor.is_general_practitioner:
         apps = Appointment.objects.filter(doctor__user__id=request.user.id).filter(has_report_added=False)
-
-        total = 0
-
-        for app in apps:
-            total += 1
-            data.append({'app_num': app.appointment_number, 'app_id': app.id, 'patient_name': app.patient.__str__(),
-                         'date': app.date, 'time': app.time})
-        # data.append({'patients': patients})
-        print("Returning apps")
-
-        return JsonResponse({'total': total, 'apps': data})
+        total, data = get_string_list_apps(apps)
     else:
-        doctors_patients = doctor.patient_set.all()
-        patients_without_gp = Patient.objects.filter(general_practitioner=None)
-        context = {
-            'doctors_patients': doctors_patients,
-            'patients_without_gp': patients_without_gp
-        }
+        apps = Appointment.objects.filter(doctor__user__id=request.user.id).filter(has_report_added=True)
+        total, data = get_string_list_apps(apps)
 
-    return JsonResponse({'response': context})
+    return JsonResponse({'total': total, 'apps': data})
+
+
+def get_string_list_apps(apps):
+    total = 0
+    data = []
+
+    for app in apps:
+        total += 1
+        data.append({'app_num': app.appointment_number, 'app_id': app.id, 'patient_name': app.patient.__str__(),
+                     'date': app.date, 'time': app.time, 'ssn': app.patient.ssn})
+
+    return total, data
+
+def get_patient_apps_list(request):
+    patient_email = request.GET['patient_email']
+
+    apps_past = Appointment.objects.all().filter(patient__user__email=patient_email).filter(has_report_added=True)
+    apps_future = Appointment.objects.all().filter(patient__user__email=patient_email).filter(has_report_added=False)
+
+    total_past, apps_past_string = get_string_list_apps(apps_past)
+    total_future, apps_future_string = get_string_list_apps(apps_future)
+
+    return JsonResponse({'total_past': total_past, 'apps_past': apps_past_string, 'total_future': total_future, 'apps_future': apps_future_string})

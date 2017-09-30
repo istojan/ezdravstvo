@@ -26,7 +26,7 @@
 			<div id="tabs" style="width: 100%; height: 29px;"></div>
 			<div id="tab1" class="tab">
                 <div>
-                    <h4>Лични информации</h4>
+                    <h3>Лични информации</h3>
 
                     Име: {{ doctor.name }} <br>
                     Презиме: {{ doctor.surname }} <br>
@@ -35,7 +35,7 @@
 
                 </div>
                 <div>
-                    <h4>Специјализација</h4>
+                    <h3>Специјализација</h3>
                     Специјалист (да наведеме некако специјализации...)
                 </div>
 
@@ -47,29 +47,22 @@
 
             </div>
             <div id="tab2" class="tab">
-                <h4>Матични Пациенти</h4>
+                <h3>Матични Пациенти</h3>
                 <div id="grid1" style="height: 700px"></div>
                 <button onclick="display_patient_details('gp');">Прикажи пациент</button>
             </div>
             <div id="tab3" class="tab">
-                <h4>Пациенти без матичен доктор</h4>
+                <h3>Пациенти без матичен доктор</h3>
                 <div id="grid2" style="height: 700px"></div>
                 <button onclick="display_patient_details('no_gp');">Прикажи пациент</button>
             </div>
             <div id="tab4" class="tab">
-                <h4>Закажани прегледи</h4>
-                OVA NE E NAPRAVENO DEKA TREBA DA VIDIME KAKO
+                <h3>Минати прегледи</h3>
+                <div id="grid3" style="height: 700px"></div>
+                <button onclick="display_appointment_details();">Прикажи преглед</button>
             </div>
     </div>
 
-    <div id="selected-tab" style="padding: 10px 0px">tab1</div>
-    <div>
-        <button>
-            <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
-                Make appointment
-            </a>
-        </button>
-    </div>
     <button>
         <a href="{% url 'login:logout_user' %}">
             Logout
@@ -78,22 +71,6 @@
 
 </div>
 
-
-{#<h1>Матичен доктор</h1>#}
-{#<div id="tabs" style="width: 100%;"></div>#}
-{#<div id="selected-tab" style="padding: 10px 0px">tab1</div>#}
-{#<div>#}
-{#    <button>#}
-{#        <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">#}
-{#            Make appointment#}
-{#        </a>#}
-{#    </button>#}
-{#</div>#}
-{#<button>#}
-{#    <a href="{% url 'login:logout_user' %}">#}
-{#        Logout#}
-{#    </a>#}
-{#</button>#}
 <script type="text/javascript">
 
 
@@ -124,7 +101,7 @@
                             w2ui.grid2.refresh();
                         }
                         else if(event.target == 'tab4'){
-{#                            populate_appointments_list();#}
+                            populate_appointments_list();
                         }
 						console.log(event.target + " showing now")
 					}
@@ -185,11 +162,39 @@
                         populate_patients_list()
                     }
                 },
+                grid3 : {
+				    name: 'grid3',
+                    show: {
+                        toolbar: true,
+                        footer: true,
+                    },
+                    multiSearch: true,
+                    searches: [
+                        { field: 'recid', caption: 'ID ', type: 'int' },
+                        { field: 'app_num', caption: 'Број на термин', type: 'text' },
+                        { field: 'patient_name', caption: 'Пациент', type: 'text' },
+                        { field: 'ssn', caption: 'Матичен број', type: 'text' },
+                        { field: 'date', caption: 'Датум', type: 'date'}
+                    ],
+                    columns: [
+                        { field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
+                        { field: 'app_id', size: '0px', hidden: true},
+                        { field: 'app_num', caption: 'Број на термин', size: '30%', sortable: true },
+                        { field: 'patient_name', caption: 'Име на Пациент', size: '30%', sortable: true },
+                        { field: 'ssn', caption: 'Матичен број', size: '20%' },
+                        { field: 'date', caption: 'Датум', render: 'date:yyyy-mm-dd', size: '120px' }
+                    ],
+                    onReload: function (event) {
+                        console.log("Trying to reload")
+                        appointments_list_populated = false
+                        populate_appointments_list()
+                    }
+                },
 
     };
 
     patients_list_populated = false
-
+    appointments_list_populated  = false
 
     function display_patient_details(button_pushed) {
         // first get patient.user.id
@@ -267,6 +272,49 @@
             w2ui.grid2.refresh();
         }
 
+    }
+
+    function display_appointment_details() {
+        // first get app.id
+        recid = w2ui.grid3.getSelection()
+        if(recid.length == 0){
+            w2alert("Немате селектирано преглед")
+        }
+        else{
+            var record = w2ui.grid3.get(recid);
+            app_id = record[0].app_id;
+
+            // shabanski fix
+            var url_to_app = '/doctor/' + {{ request.user.id }} + '/appointment/' + app_id;
+            window.location = document.location.origin + url_to_app
+        }
+    }
+
+    function populate_appointments_list() {
+        if(!appointments_list_populated){
+            console.log("Populating app list")
+            $('#grid3').w2grid(config.grid3);
+            w2ui.grid3.clear();
+            current_rec_id_apps = 1
+
+            $.ajax({
+                url: '{% url 'doctor:appointments_list' %}',
+                dataType: 'json',
+                success: function(response) {
+                    total = response.total
+                    console.log("Total " + total)
+                    for(i = 0 ; i < total ; i++){
+                        console.log(response.apps[i].app_num)
+                        console.log(response.apps[i].app_id)
+                        console.log(response.apps[i].date)
+                        w2ui['grid3'].add([{recid: current_rec_id_apps, app_id: response.apps[i].app_id, app_num: response.apps[i].app_num, patient_name: response.apps[i].patient_name, date: response.apps[i].date, time: response.apps[i].ssn}]);
+                        current_rec_id_apps += 1
+                    }
+                }
+            });
+            appointments_list_populated = true
+            w2ui.grid3.refresh();
+        }
     }
 
     $(function() {
