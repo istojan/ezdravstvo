@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^registerPatient/$', views.PatientRegistrationView.as_view(), name='register_patient'),
     url(r'^registerDoctor/$', views.DoctorRegistrationView.as_view(), name='register_doctor'),
     url(r'^ajax/get_gps_for_hospital/$', utils.get_gps_for_hospital, name='get_gps_for_hospital'),
+    url(r'^ajax/change_user_password/$', utils.change_user_password, name='change_user_password'),
 ]
