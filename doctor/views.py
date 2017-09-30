@@ -220,6 +220,16 @@ class AddReportView(View):
 
 def appointment_details(request, doctor_id, appointment_id):
     appointment = Appointment.objects.get(pk=appointment_id)
+
+    try:
+        if request.user.patient:
+            # If the program comes here, than a patient tries to get access to doctor view. That can't happen
+            return Http404("Access denied")
+
+    except Exception as e:
+        # a doctor is trying to access app details as he should
+        pass
+
     context = {
         'appointment': appointment
     }
