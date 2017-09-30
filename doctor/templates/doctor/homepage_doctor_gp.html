@@ -307,7 +307,14 @@
                         console.log(response.apps[i].app_num)
                         console.log(response.apps[i].app_id)
                         console.log(response.apps[i].date)
-                        w2ui['grid3'].add([{recid: current_rec_id_apps, app_id: response.apps[i].app_id, app_num: response.apps[i].app_num, patient_name: response.apps[i].patient_name, date: response.apps[i].date, time: response.apps[i].ssn}]);
+                        console.log(response.apps[i].ssn)
+                        w2ui['grid3'].add([{recid: current_rec_id_apps,
+                            app_id: response.apps[i].app_id,
+                            app_num: response.apps[i].app_num,
+                            patient_name: response.apps[i].patient_name,
+                            ssn: response.apps[i].ssn,
+                            date: response.apps[i].date,
+                            time: response.apps[i].ssn}]);
                         current_rec_id_apps += 1
                     }
                 }

@@ -4,7 +4,7 @@ import datetime
 # List contains only weekdays
 from django.http import JsonResponse
 
-from login.models import Doctor, Appointment, Patient
+from login.models import Doctor, Appointment, Patient, Report
 
 
 def get_list_dates(count_days):
@@ -155,6 +155,7 @@ def get_string_list_apps(apps):
 
     return total, data
 
+
 def get_patient_apps_list(request):
     patient_email = request.GET['patient_email']
 
@@ -165,3 +166,21 @@ def get_patient_apps_list(request):
     total_future, apps_future_string = get_string_list_apps(apps_future)
 
     return JsonResponse({'total_past': total_past, 'apps_past': apps_past_string, 'total_future': total_future, 'apps_future': apps_future_string})
+
+
+def add_gp_appointment(request):
+    doctor_id = request.POST['doctor_id']
+    patient_id = request.POST['patient_id']
+    diagnosis = request.POST['diagnosis']
+    therapy = request.POST['therapy']
+    remark = request.POST['remark']
+    try:
+        doctor = Doctor.objects.get(pk=doctor_id)
+        patient = Patient.objects.get(pk=patient_id)
+        app = Appointment(patient=patient, doctor=doctor, date=datetime.date.today(), time='00:00', has_report_added=True)
+        app.save()
+        report = Report(appointment=app, diagnosis=diagnosis, therapy=therapy, remark=remark)
+        report.save()
+        return JsonResponse({'success': ""})
+    except (Doctor.DoesNotExist, Patient.DoesNotExist):
+        return JsonResponse({'error': 'Грешка при внесување на прегледот!'})
