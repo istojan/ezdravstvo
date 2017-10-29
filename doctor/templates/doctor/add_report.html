@@ -1,15 +1,61 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'doctor/doctor_style.css' %}"/>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Внеси извештај</title>
+
+    <style>
+        input{
+            float:right;
+            font-size: 20px;
+        }
+
+        select{
+            float: right;
+            margin-left: 5px;
+        }
+
+        form{
+            padding: 30px;
+            font-size: 25px;
+            margin-left: 5%;
+        }
+    </style>
+
 </head>
 <body>
-<h3>Нов извештај:</h3>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Потврди</button>
-</form>
+
+<div id="body_container">
+    <div id="toolbar">
+        <div style="display: inline-block; width: 50%;" >
+            <h1 style="padding-left: 30px; color: darkblue">{{ request.user.doctor }}</h1>
+        </div>
+
+        <div class="toolbar_links">
+            <button onClick="javascript:history.go(-1);" style="float: right;">
+                    Назад
+            </button>
+        </div>
+
+        <div class="toolbar_links" style="width: 20%">
+            <a href="{% url 'login:logout_user' %}"><button style="display: block;">Одјави се</button></a>
+        </div>
+    </div>
+
+    <div id="information_container">
+        <h3 style="margin-left: 8%">Нов извештај</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="present_button" type="submit">Потврди</button>
+        </form>
+    </div>
+
+</div>
+
 </body>
 </html>
