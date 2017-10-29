@@ -7,12 +7,15 @@ from login.models import Hospital
 
 
 class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)  # the widget will hide the password from the user
+    password = forms.CharField(label='Лозинка', widget=forms.PasswordInput)  # the widget will hide the password from the user
 
     class Meta:
         model = User
         # fields = ['username', 'email', 'password']
         fields = ['email', 'password']
+        labels = {
+            'email': "Е-мајл адреса"
+        }
         # help_texts = {
         #     'username': None,
         #     'email': None,
@@ -37,13 +40,18 @@ class PatientRegistrationForm(UserCreationForm):
                                       widget=forms.Select(attrs={'onchange': 'get_doctors()'}))
     general_practitioner = ChoiceFieldNoValidation(label="Матичен доктор",
                                                    required=False)
+    password1 = forms.CharField(label='Лозинка',
+                               widget=forms.PasswordInput)  # the widget will hide the password from the user
+    password2 = forms.CharField(label='Внеси повторно лозинка',
+                               widget=forms.PasswordInput)  # the widget will hide the password from the user
 
     class Meta:
         model = User
         fields = ('name', 'surname', 'ssn', 'date_of_birth', 'address', 'email', 'password1', 'password2',
                   'hospital', 'general_practitioner')
         labels = {
-            'email': 'Email адреса'
+            'email': 'Email адреса',
+            'password1': 'Лозинка'
         }
 
 
@@ -53,6 +61,11 @@ class DoctorRegistrationForm(UserCreationForm):
     doctor_id = forms.CharField(label="Докторска идентификација", max_length=6)
     hospital = forms.ModelChoiceField(label="Здравствена установа", queryset=Hospital.objects.all())
     is_general_practitioner = forms.BooleanField(label="Матичен доктор", required=False)
+    password1 = forms.CharField(label='Лозинка',
+                               widget=forms.PasswordInput)  # the widget will hide the password from the user
+    password2 = forms.CharField(label='Внеси повторно лозинка',
+                               widget=forms.PasswordInput)  # the widget will hide the password from the user
+
 
     class Meta:
         model = User

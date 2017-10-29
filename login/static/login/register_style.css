@@ -1,0 +1,30 @@
+input{
+    float:right;
+    font-size: 16px;
+}
+
+select{
+    float: right;
+    margin-left: 5px;
+}
+
+form{
+    width: 600px;
+    padding: 30px;
+    font-size: 20px;
+    margin-left: 150px;
+}
+
+#body_container{
+    background: white;
+    width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    /*margin: auto;*/
+    height: 800px;
+    border: solid black 5px;
+}
+
+p{
+    padding-bottom: 10px;
+}

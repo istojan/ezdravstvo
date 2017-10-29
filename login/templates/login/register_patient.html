@@ -1,3 +1,7 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'login/register_style.css' %}"/>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,10 +36,15 @@
         })
     }
 </script>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-</form>
+<div id="body_container">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button style="float: right; margin-top: 30px; font-size: 20px;" type="submit">Регистрирај се</button>
+    </form>
+
+    <a href="{% url 'login:index' %}"><button style="margin-top: -21px; margin-left: 180px; font-size: 20px;">Назад</button></a>
+</div>
+
 </body>
 </html>
