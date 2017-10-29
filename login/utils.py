@@ -1,4 +1,5 @@
 # Add a patient reference to a doctor (general practitioner)
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 
@@ -31,6 +32,7 @@ def get_gps_for_hospital(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='login:index')
 def change_user_password(request):
     user_id = request.user.id
     old_password = request.POST['old_password']

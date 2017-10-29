@@ -72,6 +72,7 @@ def homepage(request):
         return HttpResponseRedirect(reverse('login:index'))  # request to default page if no user is logged in
 
 
+@login_required(login_url='login:index')
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse('login:index'))
