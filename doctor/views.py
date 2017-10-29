@@ -218,6 +218,7 @@ class AddReportView(View):
             return Http404("Не постои прегледот!")
 
 
+@login_required(login_url='login:index')
 def appointment_details(request, doctor_id, appointment_id):
     appointment = Appointment.objects.get(pk=appointment_id)
 
@@ -236,6 +237,7 @@ def appointment_details(request, doctor_id, appointment_id):
     return render(request, 'doctor/appointment_details.html', context)
 
 
+@login_required(login_url='login:index')
 def patientDetails(request, doctor_id, patient_id):
     patient = Patient.objects.get(user__id=patient_id)
     appointments = Appointment.objects.filter(patient__user__id=patient_id)     # list of all doctors that the patinet had a appointment with

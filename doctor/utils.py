@@ -2,6 +2,7 @@ import datetime
 
 # returns a list of pairs of datetime and string of datetime suitable to be given as an argument od ChoiceFields.choices
 # List contains only weekdays
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
 from login.models import Doctor, Appointment, Patient, Report
@@ -40,6 +41,7 @@ def get_apps_times_for_date():
     return choices_times
 
 
+@login_required(login_url='login:index')
 def get_doctors_for_hospital(request):
     hospital_id = request.GET.get('hospital_id', "")
     data = []
@@ -54,6 +56,7 @@ def get_doctors_for_hospital(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='login:index')
 def remove_self_as_gp(request):
     patient_id = request.GET.get('patient_id', "")
     response = "Failure"
@@ -69,6 +72,7 @@ def remove_self_as_gp(request):
     return JsonResponse({'response': response})
 
 
+@login_required(login_url='login:index')
 def add_self_as_gp(request):
     patient_id = request.GET.get('patient_id', "")
     response = "Failure"
@@ -85,6 +89,7 @@ def add_self_as_gp(request):
     return JsonResponse({'response': response})
 
 
+@login_required(login_url='login:index')
 def remove_report_from_appointment(request):
     appointment_id = request.GET.get('appointment_id', "")
     response = "Failure"
@@ -98,6 +103,8 @@ def remove_report_from_appointment(request):
             response = "Failure"
     return JsonResponse({'response': response})
 
+
+@login_required(login_url='login:index')
 def get_patients_list(request):
     doctor = request.user.doctor
 
@@ -131,6 +138,7 @@ def get_string_list_patients(patients):
     return data, total
 
 
+@login_required(login_url='login:index')
 def get_appointments_list(request):
     doctor = request.user.doctor
 
@@ -156,6 +164,7 @@ def get_string_list_apps(apps):
     return total, data
 
 
+@login_required(login_url='login:index')
 def get_patient_apps_list(request):
     patient_email = request.GET['patient_email']
 
@@ -168,6 +177,7 @@ def get_patient_apps_list(request):
     return JsonResponse({'total_past': total_past, 'apps_past': apps_past_string, 'total_future': total_future, 'apps_future': apps_future_string})
 
 
+@login_required(login_url='login:index')
 def add_gp_appointment(request):
     doctor_id = request.POST['doctor_id']
     patient_id = request.POST['patient_id']
