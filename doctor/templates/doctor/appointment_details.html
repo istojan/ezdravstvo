@@ -19,9 +19,10 @@
         </div>
 
         <div class="toolbar_links">
-            <button onClick="javascript:history.go(-1);" style="float: right;">
-                    Назад
-            </button>
+{#            <button onClick="javascript:history.go(-1);" style="float: right;">#}
+{#                    Назад#}
+{#            </button>#}
+            <a href="{% url 'doctor:homepage_doc' doctor_id=request.user.doctor.id %}"><button style="display: block;">Назад</button></a>
         </div>
 
         <div class="toolbar_links" style="width: 20%">
