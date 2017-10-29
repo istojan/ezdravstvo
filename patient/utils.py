@@ -78,7 +78,6 @@ def get_upcoming_appointments(request):
         return JsonResponse({'error': response})
 
 
-@login_required(login_url='login:index')
 def get_string_list_apps(apps):
     total = 0
     data = []
