@@ -39,6 +39,25 @@ div input{
     float: right;
 }
 
+/* Ova e dodadeno -------------------------------------*/
+select{
+    float:right;
+    font-size: 16px;
+}
+
+form{
+    border: 5px solid lightblue;
+    width: 400px;
+    padding: 30px 30px 60px 30px;
+    font-size: 20px;
+    margin-left: 150px;
+}
+
+#button_app {
+    float: right;
+}
+/* Do tuka ---------------------------------------------*/
+
 #w2ui-popup div div{
     padding: 10px;
     font-size: 20px;

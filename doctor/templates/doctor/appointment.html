@@ -1,3 +1,7 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'doctor/doctor_style.css' %}"/>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,12 +12,13 @@
 
 </head>
 <body>
-<form id="app_form_id" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Make Appointment</button>
-</form>
-
+<div id="body_container">
+    <form id="app_form_id" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button id="button_app" type="submit">Make Appointment</button>
+    </form>
+</div>
 <script>
 
     function get_doctors_for_hospital() {
