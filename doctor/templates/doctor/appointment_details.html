@@ -103,7 +103,11 @@
                  },
                  dataType: 'json',
                  success: function (response) {
-                     alert(response['response'])
+                     if (response['response'] == 'Success') {
+                         location.reload();
+                     } else {
+                         alert('Oops, something went wrong!');
+                     }
                  }
              });
          });
