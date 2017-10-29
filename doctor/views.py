@@ -3,6 +3,7 @@ from django.http import Http404
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 # from .forms import UserLoginForm
+from django.utils.decorators import method_decorator
 from django.views.generic import View
 
 from doctor.forms import AppointmentForm, AddReportForm
@@ -104,12 +105,14 @@ class MakeAppointmentView(View):
     form_class = AppointmentForm
     template_name = 'doctor/appointment.html'
 
+    @method_decorator(login_required(login_url='login:index'))
     def get(self, request, doctor_id):
         # doctor_id can be removed from the url here
         form = self.form_class(doctor_id = request.user.doctor.doctor_id)
 
         return render(request, self.template_name, {'form': form})
 
+    @method_decorator(login_required(login_url='login:index'))
     def post(self, request, doctor_id):
         form = self.form_class(data=request.POST)
 
@@ -135,6 +138,7 @@ class MakeAppointmentView(View):
 class PatientsPreviewView(View):
     template_name = 'doctor/patients_preview.html'
 
+    @method_decorator(login_required(login_url='login:index'))
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user__pk=request.user.id)
         if not doctor.is_general_practitioner:
@@ -166,6 +170,7 @@ class PatientsPreviewView(View):
 class OldAppointmentsView(View):
     template_name = 'doctor/old_appointments.html'
 
+    @method_decorator(login_required(login_url='login:index'))
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user__pk=request.user.id)
         # appointments = doctor.appointment_set.filter(date__lt=datetime.date.today())
@@ -183,6 +188,7 @@ class OldAppointmentsView(View):
 class UpcomingAppointmentsView(View):
     template_name = 'doctor/upcoming_appointments.html'
 
+    @method_decorator(login_required(login_url='login:index'))
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user__pk=request.user.id)
         # appointments = doctor.appointment_set.exclude(date__lt=datetime.date.today())
@@ -200,10 +206,12 @@ class UpcomingAppointmentsView(View):
 class AddReportView(View):
     form_class = AddReportForm
 
+    @method_decorator(login_required(login_url='login:index'))
     def get(self, request, doctor_id, appointment_id):
         form = self.form_class(None)
         return render(request, 'doctor/add_report.html', {'form': form})
 
+    @method_decorator(login_required(login_url='login:index'))
     def post(self, request, doctor_id, appointment_id):
         try:
             appointment = Appointment.objects.get(pk=appointment_id)
