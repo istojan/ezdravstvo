@@ -1,9 +1,10 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
 from login.models import Patient, Appointment
 
 
+@login_required(login_url='login:index')
 def get_patient_personal_info(request):
     patient_id = request.GET.get('patient_id', "")
     response = "Грешка при вчитување на податоците."
@@ -27,6 +28,7 @@ def get_patient_personal_info(request):
         return JsonResponse({'error': response})
 
 
+@login_required(login_url='login:index')
 def get_old_appointments(request):
     patient_id = request.GET.get('patient_id', "")
     response = "Грешка при вчитување на податоците."
@@ -52,6 +54,7 @@ def get_old_appointments(request):
         return JsonResponse({'error': response})
 
 
+@login_required(login_url='login:index')
 def get_upcoming_appointments(request):
     patient_id = request.GET.get('patient_id', "")
     response = "Грешка при вчитување на податоците."
@@ -75,6 +78,7 @@ def get_upcoming_appointments(request):
         return JsonResponse({'error': response})
 
 
+@login_required(login_url='login:index')
 def get_string_list_apps(apps):
     total = 0
     data = []
@@ -87,6 +91,7 @@ def get_string_list_apps(apps):
     return total, data
 
 
+@login_required(login_url='login:index')
 def get_patient_apps_list(request):
     patient_email = request.GET['patient_email']
 
