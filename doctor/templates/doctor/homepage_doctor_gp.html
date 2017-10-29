@@ -1,3 +1,7 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'doctor/doctor_style.css' %}"/>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,71 +11,76 @@
     <script type="text/javascript" src="//rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>
     <link rel="stylesheet" type="text/css" href="//rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css"/>
 
-    <style>
-        .tab {
-            width: 100%;
-            display: none;
-        }
-
-    </style>
-
 </head>
 <body>
 
-<div id="body_container_id">
+<div id="body_container">
 
-    <h1>Матичен доктор</h1>
+    <div id="toolbar">
+        <div style="display: inline-block; width: 32%">
+            <h1 style="padding-left: 30px; color: darkblue">{{ doctor.name }} {{ doctor.surname }}</h1>
+        </div>
 
-    <div id="tab-example" style="margin-top: 20px;">
+
+        <div class="toolbar_links" style="width: 21%; padding: 0;">
+            <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
+                <button style="display: block">
+                    Закажи преглед
+                </button>
+            </a>
+        </div>
+        <div class="toolbar_links" style="width: 22%">
+            <button id="btn_change_password" onclick="open_popup()" style="display:block;">
+                    Промени лозинка
+            </button>
+        </div>
+        <div class="toolbar_links">
+            <a href="{% url 'login:logout_user' %}"><button style="display: block;">Одјави се</button></a>
+        </div>
+    </div>
+
+    <div id="tab-example">
         <div id="tabs" style="width: 100%; height: 29px;"></div>
         <div id="tab1" class="tab">
-            <div>
-                <h3>Лични информации</h3>
 
-                Име: {{ doctor.name }} <br>
-                Презиме: {{ doctor.surname }} <br>
-                Докторска идентификација: {{ doctor.doctor_id }} <br>
-                Everything else...
-
-            </div>
+            <h3>Лични информации</h3>
             <div>
-                <h3>Специјализација</h3>
-                Специјалист (да наведеме некако специјализации...)
+                <div class="info_container">
+                    <div class = "label_info"> Име: </div>
+                    <div class="pers_info"> {{ doctor.name }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Презиме: </div>
+                    <div class="pers_info"> {{ doctor.surname }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Докторска идентификација: </div>
+                    <div class="pers_info"> {{ doctor.doctor_id }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Тип на доктор: </div>
+                    <div class="pers_info"> матичен доктор </div>
+                </div>
             </div>
-            <br/>
-            <button id="btn_change_password" onclick="open_popup()">
-                Промени лозинка
-            </button>
-            <br/><br/>
-            <button>
-                <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
-                    Make appointment
-                </a>
-            </button>
 
         </div>
         <div id="tab2" class="tab">
             <h3>Матични Пациенти</h3>
             <div id="grid1" style="height: 700px"></div>
-            <button onclick="display_patient_details('gp');">Прикажи пациент</button>
+            <button class="present_button"  onclick="display_patient_details('gp');">Прикажи пациент</button>
         </div>
         <div id="tab3" class="tab">
             <h3>Пациенти без матичен доктор</h3>
             <div id="grid2" style="height: 700px"></div>
-            <button onclick="display_patient_details('no_gp');">Прикажи пациент</button>
+            <button class="present_button"  onclick="display_patient_details('no_gp');">Прикажи пациент</button>
         </div>
         <div id="tab4" class="tab">
             <h3>Минати прегледи</h3>
             <div id="grid3" style="height: 700px"></div>
-            <button onclick="display_appointment_details();">Прикажи преглед</button>
+            <button class="present_button"  onclick="display_appointment_details();">Прикажи преглед</button>
         </div>
     </div>
     <br/>
-    <button>
-        <a href="{% url 'login:logout_user' %}">
-            Logout
-        </a>
-    </button>
 
 </div>
 

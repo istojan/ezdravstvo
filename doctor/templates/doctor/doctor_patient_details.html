@@ -1,3 +1,8 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'doctor/doctor_style.css' %}"/>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,64 +12,76 @@
     <script type="text/javascript" src="//rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>
     <link rel="stylesheet" type="text/css" href="//rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css"/>
 
-    <style>
-        .tab {
-            width: 100%;
-            display: none;
-        }
-
-    </style>
-
 </head>
 <body>
-<div id="body_container_id">
+<div id="body_container">
 
-    <h1>Пациент</h1>
+    <div id="toolbar">
+        <div style="display: inline-block; width: 36%;" >
+            <h1 style="padding-left: 30px; color: darkblue">{{patient}}</h1>
+        </div>
 
-    <div id="tab-example" style="margin-top: 20px;">
-        <div id="tabs" style="width: 100%; height: 29px;"></div>
-        <div id="tab1" class="tab">
-            <div>
-                <h3>Лични информации</h3>
+        <div class="toolbar_links">
+            <button onClick="javascript:history.go(-1);" style="float: right;">
+                    Назад
+            </button>
+        </div>
 
-                Име: {{ patient.name }} <br>
-                Презиме: {{ patient.surname }} <br>
-                Матичен Доктор:
-                {% if patient.general_practitioner is None %}
-                    Нема
-                {% else %}
-                    {{ patient.general_practitioner }}
-                {% endif %}
-                <br>
-                {% if patient.general_practitioner is not None and patient.general_practitioner.id == request.user.doctor.id %}
-                    <button class="doctor_is_gp" id="{{ patient.id }}">Отстрани се како матичен доктор</button>
+        <div class="toolbar_links" style="width: 19%;">
+            {% if patient.general_practitioner is not None and patient.general_practitioner.id == request.user.doctor.id %}
+                    <button style="float: right; display: inline-block; width: 100%" class="doctor_is_gp" id="{{ patient.id }}">Отстрани се </button>
                     <script>gp = true</script>
                 {% elif patient.general_practitioner is None and request.user.doctor.is_general_practitioner %}
-                    <button class="no_gp" id="{{ patient.id }}">Назначи се</button>
+                    <button style="float: right; display: inline-block; width: 100%" class="no_gp" id="{{ patient.id }}">Назначи се</button>
                     <script>gp = false</script>
                 {% else %}
                     <script>gp = false</script>
-                {% endif %}
-                <br>
-                Everything else...
-            </div>
+            {% endif %}
+        </div>
+        <div class="toolbar_links" style="width: 23%">
+            <a href="{% url 'login:logout_user' %}"><button style="display: block;">Одјави се</button></a>
+        </div>
+    </div>
 
-            <button>
-                <a href="{% url 'doctor:make_appointment' doctor_id=request.user.id %}">
-                    Make appointment
-                </a>
-            </button>
+{#    <div id="information_container">#}
+
+    <div id="tab-example">
+        <div id="tabs" style="width: 100%; height: 29px;"></div>
+        <div id="tab1" class="tab">
+            <h3>Лични информации</h3>
+            <div>
+                <div class="info_container">
+                    <div class = "label_info"> Име: </div>
+                    <div class="pers_info"> {{ patient.name }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Презиме: </div>
+                    <div class="pers_info"> {{ patient.surname }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Матичен доктор: </div>
+                    <div class="pers_info">
+                        {% if patient.general_practitioner is None %}
+                            Нема
+                        {% else %}
+                            {{ patient.general_practitioner }}
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
 
         </div>
         <div id="tab3" class="tab">
             <h3>Стари прегледи</h3>
             <div id="grid1" style="height: 700px"></div>
-            <button onclick="display_appointment_details('past');">Прикажи преглед</button>
+            <button class="present_button"   onclick="display_appointment_details('past');">Прикажи преглед</button>
         </div>
         <div id="tab4" class="tab">
             <h3>Закажани прегледи</h3>
             <div id="grid2" style="height: 700px"></div>
-            <button onclick="display_appointment_details('future');">Прикажи преглед</button>
+            <button class="present_button"   onclick="display_appointment_details('future');">Прикажи преглед</button>
         </div>
         {% if request.user.doctor.is_general_practitioner %}
             <div id="tab2" class="tab">
@@ -91,55 +108,7 @@
 
     </div>
 
-    <button>
-        <a href="{% url 'login:logout_user' %}">
-            Logout
-        </a>
-    </button>
 </div>
-{#    #}
-{#    <h2>Лични информации:</h2>#}
-{#    <div>#}
-{#        Име:     {{ patient.name }}#}
-{#    </div>#}
-{#    <div>#}
-{#        Презиме: {{ patient.surname }}#}
-{#    </div>#}
-{#    <div>#}
-{#        Матичен Доктор:#}
-{#        {% if patient.general_practitioner is None %}#}
-{#            Нема#}
-{#        {% else %}#}
-{#            {{ patient.general_practitioner }}#}
-{#        {% endif %}#}
-{#    </div>#}
-{#    <div>#}
-{#        {% if patient.general_practitioner is not None and patient.general_practitioner.id == request.user.doctor.id %}#}
-{#            <button class="doctor_is_gp" id="{{ patient.id }}">Отстрани се како матичен доктор</button>#}
-{#            <br> <br> <br>#}
-{#            Tuka da stoi edna forma shto kje ima polinja za izveshtaj:  <br>#}
-{#            Pri klikanjeto na submit, formata treba da kreira appointment so momentalniot logiran doktor, pacientot shto go pokazhuva, deneshen datum i bez vreme(00:00) <br>#}
-{#            Isto treba da kreira izveshtaj so vnesenite informacii.#}
-{##}
-{#        {% elif patient.general_practitioner is None %}#}
-{#            <button class="no_gp" id="{{ patient.id }}">Назначи се</button>#}
-{#        {% endif %}#}
-{##}
-{#    </div>#}
-{##}
-{#    <h4>Минати прегледи</h4>#}
-{#    {% for app in past_appointments %}#}
-{#        <li>#}
-{#            <a href=" {% url "doctor:appointment_details" request.user.id app.id%}">{{ app }}</a>#}
-{#        </li>#}
-{#    {% endfor %}#}
-{##}
-{#    <h4>Идни прегледи</h4>#}
-{#    {% for app in future_appointments %}#}
-{#        <li>#}
-{#            <a href="{% url "doctor:appointment_details" request.user.id app.id%}">{{ app }}</a>#}
-{#        </li>#}
-{#    {% endfor %}#}
 
 <script>
     $(document).ready(function () {

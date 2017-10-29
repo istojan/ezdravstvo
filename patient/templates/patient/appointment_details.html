@@ -1,35 +1,187 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'patient/patient_style.css' %}"/>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Извештај #{{ report.id }}</title>
+    <title>Преглед #{{ appointment.appointment_number }}</title>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script type="text/javascript" src="//rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="//rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css"/>
 </head>
 <body>
-<h3>Детали за преглед #{{ appointment.appointment_number }}</h3>
-<div>
-    Пациент: {{ appointment.patient }} <br/>
-    Единствен матичен број: {{ appointment.patient.ssn }} <br/>
-    Број на здравствена легитимација: <i>#TODO</i> <br/>
-    Единствен здравствен број на осигуреникот: <i>#TODO</i> <br/>
-    Прегледот го извршил: {{ appointment.doctor }} <br/>
-    Датум: {{ appointment.date }} <br/>
-    Час: {{ appointment.time }} <br/>
+
+<div id="body_container">
+
+    <div id="toolbar">
+        <div style="display: inline-block; width: 31%;" >
+            <h1 style="padding-left: 30px; color: darkblue">{{ request.user.patient.name }} {{ request.user.patient.surname }}</h1>
+        </div>
+
+        <div class="toolbar_links">
+            <button onClick="javascript:history.go(-1);" style="float: right;">
+                    Назад
+            </button>
+        </div>
+
+        <div class="toolbar_links" style="width: 22%;">
+            <button id="btn_change_password" onclick="open_popup()" style="float: right;">
+                    Промени лозинка
+            </button>
+        </div>
+        <div class="toolbar_links" style="width: 20%">
+            <a href="{% url 'login:logout_user' %}"><button style="display: block;">Одјави се</button></a>
+        </div>
+    </div>
+
+    <div id="information_container">
+        <h2>Детали за преглед #{{ appointment.appointment_number }}</h2>
+        <div class="app_cont">
+            <h3>Информации за пациентот</h3>
+
+            <div>
+                <div class="info_container">
+                    <div class = "label_info"> Пациент: </div>
+                    <div class="pers_info"> {{ appointment.patient }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Матичен број: </div>
+                    <div class="pers_info"> {{ appointment.patient.ssn }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Датум на раѓање: </div>
+                    <div class="pers_info"> {{ appointment.patient.date_of_birth }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Адреса на живеење: </div>
+                    <div class="pers_info"> {{ appointment.patient.address }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Матичен доктор: </div>
+                    <div class="pers_info">
+                        {% if appointment.patient.general_practitioner %}
+                            {{ appointment.patient.general_practitioner }}
+                        {% else %}
+                            Нема
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Задолжен доктор за прегледот: </div>
+                    <div class="pers_info"> {{ appointment.doctor }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Датум: </div>
+                    <div class="pers_info"> {{ appointment.date }} </div>
+                </div>
+                <div class="info_container">
+                    <div class = "label_info"> Час: </div>
+                    <div class="pers_info"> {{ appointment.time }} </div>
+                </div>
+
+
+            </div>
+        </div>
+        <div class="app_cont">
+            {% if appointment.report %}
+            <div>
+                <h3>Дијагноза</h3>
+                <div class="info_container">
+                    <div class = "label_info" style="font-weight: bold;"> {{ appointment.report.diagnosis }} </div>
+                </div>
+
+                <h3>Терапија:</h3>
+                <div class="info_container">
+                    <div class = "label_info" style="font-weight: bold;"> {{ appointment.report.therapy }} </div>
+                </div>
+
+                <h3>Забелешка:</h3>
+                <div class="info_container">
+                    <div class = "label_info" style="font-weight: bold;"> {{ appointment.report.remark }} </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
 </div>
-{% if appointment.report %}
-<div>
-    <h5>Дијагноза</h5>
-    <div>
-        {{ appointment.report.diagnosis }}
-    </div>
-    <h5>Терапија:</h5>
-    <div>
-        {{ appointment.report.therapy }}
-    </div>
-    <h5>Забелешка:</h5>
-    <div>
-        {{ appointment.report.remark }}
-    </div>
-</div>
-{% endif %}
+
+<script>
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    function validate() {
+        var old_pass = $('#old_pass').val();
+        var new_pass = $('#new_pass').val();
+        var confirm_pass = $('#confirm_pass').val();
+        if (old_pass.trim() == "" || new_pass.trim() == "" || confirm_pass == "") {
+            $('#error_text').html("Мора да ги внесете сите полиња!");
+            return false;
+        }
+        if (new_pass != confirm_pass) {
+            $('#error_text').html("Новата лозинка не поклопува со потврдата!");
+            return false;
+        }
+        return true;
+    }
+
+    function open_popup() {
+        w2popup.open({
+            title: 'Промена на лозинка',
+            body: "Стара лозинка: <input type=\"password\" id=\"old_pass\"><br/><br/>\n" +
+            "Нова лозинка: <input type=\"password\" id=\"new_pass\"><br/><br/>\n" +
+            "Потврдете лозинка: <input type=\"password\" id=\"confirm_pass\"><br/><br/>\n" +
+            "<div id=\"error_text\" style=\"color:red;\"></div><br/>" +
+            "<button id=\"btn_confirm\">Потврди</button>"
+        });
+        $('#btn_confirm').on('click', function (event) {
+            console.log("Pressed");
+            if (validate()) {
+                var old_pass = $('#old_pass').val();
+                var new_pass = $('#new_pass').val();
+                var confirm_pass = $('#confirm_pass').val();
+                attempt_change_password(old_pass, new_pass, confirm_pass);
+            }
+        });
+    }
+
+    function go_to_login() {
+        location.href = '{% url 'login:index' %}';
+    }
+
+    function attempt_change_password(old_password, new_password, confirm_password) {
+        var csrftoken = getCookie('csrftoken');
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'login:change_user_password' %}',
+            data: {
+                'old_password': old_password,
+                'new_password': new_password,
+                'confirm_password': confirm_password
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.hasOwnProperty('error')) {
+                    alert(response['error'])
+                } else {
+                    go_to_login();
+                }
+            }
+        });
+    }
+</script>
+
 </body>
 </html>

@@ -1,3 +1,7 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'patient/patient_style.css' %}"/>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,63 +12,85 @@
     <script type="text/javascript" src="//rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.js"></script>
     <link rel="stylesheet" type="text/css" href="//rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css"/>
 
-    <style>
-        .tab {
-            width: 100%;
-            display: none;
-        }
-
-    </style>
-
 </head>
 <body>
 
-<div id="body_container_id">
+<div id="body_container">
 
-    <h1>Пациент</h1>
+    <div id="toolbar">
+        <div style="display: inline-block; width: 46%;">
+            <h1 style="padding-left: 30px; color: darkblue">{{ patient.name }} {{ patient.surname }}</h1>
+        </div>
 
-    <div id="tab-example" style="margin-top: 20px;">
-        <div id="tabs" style="width: 100%; height: 29px;"></div>
+        <div class="toolbar_links">
+            <button id="btn_change_password" onclick="open_popup()" style="float: right;">
+                    Промени лозинка
+            </button>
+        </div>
+        <div class="toolbar_links" style="width: 20%">
+            <a href="{% url 'login:logout_user' %}"><button style="display: block;">Одјави се</button></a>
+        </div>
+    </div>
+
+    <div id="tab-example">
+        <div id="tabs"></div>
         <div id="tab1" class="tab">
             <div>
-                <h4>Лични информации</h4>
+                <h2>Лични информации</h2>
 
                 <div>
-                    Име: <b>{{ patient.name }}</b><br/>
-                    Презиме: <b>{{ patient.surname }}</b><br/>
-                    Матичен број: <b>{{ patient.ssn }}</b><br/>
-                    Датум на раѓање: <b>{{ patient.date_of_birth }}</b><br/>
-                    Адреса на живеење: <b>{{ patient.address }}</b><br/>
-                    email: <b>{{ patient.user.email }}</b><br/>
-                    Матичен доктор:
-                    {% if patient.general_practitioner %}
-                        <b>{{ patient.general_practitioner }}</b>
-                    {% else %}
-                        Нема
-                    {% endif %}
-                    <br/>
+                    <div class="info_container">
+                        <div class = "label_info"> Име: </div>
+                        <div class="pers_info"> {{ patient.name }} </div>
+                    </div>
+                    <div class="info_container">
+                        <div class = "label_info"> Презиме: </div>
+                        <div class="pers_info"> {{ patient.surname }} </div>
+                    </div>
+                    <div class="info_container">
+                        <div class = "label_info"> Матичен број: </div>
+                        <div class="pers_info"> {{ patient.ssn }} </div>
+                    </div>
+                    <div class="info_container">
+                        <div class = "label_info"> Датум на раѓање: </div>
+                        <div class="pers_info"> {{ patient.date_of_birth }} </div>
+                    </div>
+                    <div class="info_container">
+                        <div class = "label_info"> Адреса на живеење: </div>
+                        <div class="pers_info"> {{ patient.address }} </div>
+                    </div>
+                    <div class="info_container">
+                        <div class = "label_info"> Е-мајл адреса: </div>
+                        <div class="pers_info"> {{ patient.user.email }} </div>
+                    </div>
+                    <div class="info_container">
+                        <div class = "label_info"> Матичен доктор: </div>
+                        <div class="pers_info">
+                            {% if patient.general_practitioner %}
+                                {{ patient.general_practitioner }}
+                            {% else %}
+                                Нема
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-                <button id="btn_change_password" onclick="open_popup()">
-                    Промени лозинка
-                </button>
-
             </div>
 
         </div>
         <div id="tab2" class="tab">
-            <h3>Минати прегледи</h3>
-            <div id="grid1" style="height: 700px"></div>
-            <button onclick="display_appointment_details('past');">Прикажи преглед</button>
+            <h2 style="color: darkblue">Минати прегледи</h2>
+            <div id="grid1" style="height: 750px"></div>
+            <button class="present_button" onclick="display_appointment_details('past');">Прикажи преглед</button>
         </div>
         <div id="tab3" class="tab">
-            <h3>Закажани прегледи</h3>
-            <div id="grid2" style="height: 700px"></div>
-            <button onclick="display_appointment_details('future');">Прикажи преглед</button>
+            <h2 style="color: darkblue">Закажани прегледи</h2>
+            <div id="grid2" style="height: 750px"></div>
+            <button class="present_button" onclick="display_appointment_details('future');">Прикажи преглед</button>
         </div>
     </div>
 
     <br/>
-    <a href="{% url 'login:logout_user' %}">Одјави се</a>
+
 
 </div>
 

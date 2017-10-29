@@ -1,0 +1,109 @@
+#body_container{
+    background: white;
+    width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    /*margin: auto;*/
+    height: 1500px;
+    /*background-color: lightblue;*/
+    /*border: solid black 5px;*/
+}
+
+#toolbar{
+    background-color: #fafafa;
+    height: 100px;
+    border: 5px solid lightblue;
+}
+
+a{
+    /*position: relative;*/
+    /*padding: 0px;*/
+    /*margin: 28px;*/
+    /*width: 150px;*/
+    /*height: 15px;*/
+    /*margin-left: 2%;*/
+    text-decoration: none;
+}
+
+.toolbar_links{
+    margin-left: 1%;
+    display: inline-block;
+}
+
+.tab {
+    display: none;
+    padding: 20px;
+}
+
+div input{
+    float: right;
+}
+
+#w2ui-popup div div{
+    padding: 10px;
+    font-size: 20px;
+}
+
+#w2ui-popup button{
+    float: right;
+}
+
+.label_info{
+    display: inline-block;
+    width: 45%;
+}
+
+.pers_info{
+    display: inline-block;
+    font-weight: bold;
+}
+
+.info_container{
+    margin-bottom: 15px;
+    color: darkblue;
+    font-size: 22px;
+}
+
+h2{
+    color: darkblue;
+    font-weight: bold;
+}
+
+h3{
+    color: darkblue;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+h4{
+    color: darkblue;
+}
+
+.present_button{
+    margin-top: 10px;
+    float:right;
+}
+
+button{
+    font-size: 17px; color: darkblue;
+}
+
+#tab-example{
+    border: 5px solid lightblue;
+    border-top: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    height: 950px;
+}
+
+/*same as tab-example, but for app details view*/
+#information_container{
+    border: 5px solid lightblue;
+    border-top: 0;
+    height: 950px;
+    padding: 10px;
+}
+
+.app_cont{
+    margin-bottom: 60px;
+}
